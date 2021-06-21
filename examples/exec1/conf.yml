@@ -1,0 +1,24 @@
+name: 'app'
+global:
+  host: '127.0.0.1'
+  #日志级别: trace,debug,info,warn,error,fatal,panic
+  log_level: 'debug'
+http_server:
+  api_root: '/api'
+  port: ':300'
+  mode: 'release' #release|debug
+redis:
+  host: '{host}:6379'
+  pwd: ''
+  max_retries: 5
+  min_idle_connections: 10
+  max_conn_age_seconds: 600
+mysql:
+  #root:123@tcp({host}:3306)/mysql?charset=utf8mb4&collation=utf8mb4_bin&timeout=5s&loc=Local
+  dsn: '{user}:{pwd}@tcp({host}:3306)/{db}?charset=utf8mb4&collation=utf8mb4_bin&timeout=5s&loc=Local'
+  db: 'test'
+  use_cache: false
+  show_sql: true
+  max_idle_connections: 10
+  max_open_connections: 200
+  max_conn_lifetime_seconds: 60
