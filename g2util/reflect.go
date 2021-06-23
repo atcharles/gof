@@ -14,5 +14,9 @@ func ValueIndirect(val reflect.Value) reflect.Value {
 
 //NewValue ...
 func NewValue(bean interface{}) (val interface{}) {
-	return reflect.New(ValueIndirect(reflect.ValueOf(bean)).Type()).Interface()
+	v := ValueIndirect(reflect.ValueOf(bean))
+	if v.IsZero() {
+		panic("need not zero value")
+	}
+	return reflect.New(v.Type()).Interface()
 }

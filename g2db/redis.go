@@ -58,7 +58,7 @@ func (r *redisObj) AfterShutdown() {
 }
 
 //PubDelCache ...
-func (r *redisObj) PubDelCache(keys []string) error { return r.Pub(redisSubDelMemCache, keys) }
+func (r *redisObj) PubDelCache(keys []string) error { return r.Pub(r.pubDelMemChannel(), keys) }
 
 //Pub ...
 func (r *redisObj) Pub(name string, data interface{}) error {
@@ -72,7 +72,7 @@ func (r *redisObj) Pub(name string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-	return r.client().Publish(context.Background(), redisSubChannel, msg).Err()
+	return r.client().Publish(context.Background(), r.subChannel(), msg).Err()
 }
 
 func (r *redisObj) SubHandle(name string, handler RedisSubHandlerFunc) { r.subHandlers[name] = handler }
@@ -82,7 +82,7 @@ func (r *redisObj) Subscribe() {
 	r.subHandlers = make(map[string]RedisSubHandlerFunc)
 	r.closeSub = make(chan struct{})
 	//rev handlers
-	r.SubHandle(redisSubDelMemCache, r.Cache.RedisSubDelCache())
+	r.SubHandle(r.pubDelMemChannel(), r.Cache.RedisSubDelCache())
 	if e := r.subscribe(); e != nil {
 		r.Logger.Fatalln(e)
 	}
@@ -115,7 +115,7 @@ func (r *redisObj) subAction(sub *redis.PubSub) {
 
 func (r *redisObj) subscribe() (err error) {
 	ctx := context.Background()
-	sub := r.client().Subscribe(ctx, redisSubChannel)
+	sub := r.client().Subscribe(ctx, r.subChannel())
 	_, err = sub.ReceiveTimeout(ctx, time.Second*3)
 	if err != nil {
 		err = fmt.Errorf("订阅Redis失败: %s", err.Error())
@@ -160,4 +160,14 @@ func (r *redisObj) newOption(db int) *redis.Options {
 		MinIdleConns: cast.ToInt(cfg["min_idle_connections"]),
 		MaxConnAge:   cast.ToDuration(cfg["max_conn_age_seconds"]) * time.Second,
 	}
+}
+
+//subChannel ...
+func (r *redisObj) subChannel() string {
+	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), redisSubChannel)
+}
+
+//pubDelMemChannel ...
+func (r *redisObj) pubDelMemChannel() string {
+	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), redisSubDelMemCache)
 }

@@ -31,6 +31,8 @@ type Mysql struct {
 	Redis  *redisObj        `inject:""`
 	Cache  *cacheMem        `inject:""`
 
+	CacheBind *cacheBind `inject:""`
+
 	mu  sync.RWMutex
 	eg  *xorm.Engine
 	out io.Writer
@@ -75,54 +77,53 @@ func (m *Mysql) Insert(bean interface{}) (err error) {
 }
 
 //Update ...
-func (m *Mysql) Update(bean interface{}, params ...interface{}) (err error) {
-	if len(params) > 0 && params[0] != nil {
+/**
+ * @Description:
+ * @receiver m
+ * @param bean
+ * @param params
+:len(params)==0
+查询缓存原始数据
+合并新数据
+更新新数据
+:len(params)==1
+查询原始数据
+合并params
+更新数据
+:len(params)==2
+添加cols
+ * @return err
+*/
+func (m *Mysql) Update(bean interface{}, params ...interface{}) (newBean interface{}, err error) {
+	newBean, err = g2util.CopyBean(bean)
+	if err != nil {
+		return
+	}
+	if err = m.cacheGet(newBean); err != nil {
+		return
+	}
+	//删除原始缓存,防止修改主键内容导致内存没有被删除
+	if err = m.DelCache(newBean); err != nil {
+		return
+	}
+
+	if err = g2util.MergeBeans(bean, newBean); err != nil {
+		return
+	}
+
+	var cols []string
+	if len(params) == 1 {
 		mp, ok := params[0].(g2util.Map)
 		if !ok {
 			err = errors.New("first param must be a Map type")
 			return
 		}
-		id := mp.GetInt64("id")
-		if id == 0 {
-			return errors.New("id数据不能为0")
-		}
-
-		//原始数据
-		b1 := g2util.NewValue(bean)
-		if err = mp.ToBean(b1); err != nil {
-			return
-		}
-		if err = m.cacheGet(b1); err != nil {
-			return
-		}
-
-		//删除原始缓存
-		if err = m.DelCache(b1); err != nil {
-			return
-		}
-
-		//原始数据转换成map
-		var mp1 g2util.Map
-		mp1, err = g2util.Bean2Map(b1)
-		if err != nil {
-			return
-		}
-
-		//将新数据合并到原始数据
-		mp.MergeTo(mp1)
-
-		if err = mp1.ToBean(bean); err != nil {
+		if err = mp.Merge2Bean(newBean); err != nil {
 			return
 		}
 	}
 
-	queryList := new(cacheBind).Values(bean)
-	if len(queryList) == 0 {
-		return
-	}
-
-	var cols []string
-	if len(params) > 1 && params[1] != nil {
+	if len(params) == 2 {
 		var ok bool
 		cols, ok = params[1].([]string)
 		if !ok {
@@ -131,25 +132,30 @@ func (m *Mysql) Update(bean interface{}, params ...interface{}) (err error) {
 		}
 	}
 
-	return m.TXCallback(func(sn *xorm.Session) error {
+	queryList := new(cacheBind).Values(newBean)
+	if len(queryList) == 0 {
+		return
+	}
+
+	_f1 := func(sn *xorm.Session) *xorm.Session {
 		sn = sn.NoAutoCondition().Where(queryList[0])
 		if len(cols) == 0 {
-			sn = sn.UseBool().AllCols()
-		} else {
-			sn = sn.Cols(cols...)
+			return sn.UseBool().AllCols()
 		}
-
-		a, e := sn.Update(bean)
+		return sn.Cols(cols...)
+	}
+	err = m.TXCallback(func(sn *xorm.Session) error {
+		a, e := _f1(sn).Update(newBean)
 		if e != nil {
 			return e
 		}
 		if a == 0 {
 			return errors.New("未更新数据")
 		}
-
 		//更新,删除新条件缓存
-		return m.DelCache(bean)
+		return m.DelCache(newBean)
 	})
+	return
 }
 
 //Delete ...
@@ -195,7 +201,7 @@ type ErrorMysqlNotFound string
 func (e ErrorMysqlNotFound) Error() string { return string(e) }
 
 func (m *Mysql) cacheGet(bean interface{}, condition ...interface{}) (err error) {
-	queryList := new(cacheBind).Values(bean, condition...)
+	queryList := m.CacheBind.Values(bean, condition...)
 	if len(queryList) == 0 {
 		return errors.New("查询条件为空")
 	}

@@ -8,14 +8,15 @@ import (
 	"github.com/unknwon/com"
 )
 
-//Map ...
-type Map map[string]interface{}
-
-//MergeTo ...
-func (m Map) MergeTo(mp Map) {
-	for k, v := range m {
-		mp[k] = v
+//MergeBeans ...
+//合并结构数据
+func MergeBeans(dst interface{}, src interface{}) (err error) {
+	mpDst, err := Bean2Map(dst)
+	if err != nil {
+		return
 	}
+	err = mpDst.Merge2Bean(src)
+	return
 }
 
 //Bean2Map ...
@@ -29,6 +30,44 @@ func Bean2Map(bean interface{}) (Map, error) {
 		return nil, err
 	}
 	return mp, nil
+}
+
+//CopyBean ...
+/**
+ * @Description: copy原始数据到新数据
+ * @param bean
+ * @return newBean
+ * @return err
+ */
+func CopyBean(bean interface{}) (newBean interface{}, err error) {
+	mp1, err := Bean2Map(bean)
+	if err != nil {
+		return
+	}
+	newBean = NewValue(bean)
+	err = mp1.ToBean(newBean)
+	return
+}
+
+//Map ...
+type Map map[string]interface{}
+
+//Merge2Bean ...
+func (m Map) Merge2Bean(bean interface{}) (err error) {
+	mp, err := Bean2Map(bean)
+	if err != nil {
+		return
+	}
+	m.MergeTo(mp)
+	err = m.ToBean(bean)
+	return
+}
+
+//MergeTo ...
+func (m Map) MergeTo(mp Map) {
+	for k, v := range m {
+		mp[k] = v
+	}
 }
 
 //ToBean ...
