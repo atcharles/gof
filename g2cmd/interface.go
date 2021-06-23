@@ -17,26 +17,22 @@ type G2cmd struct {
 	AbFile *g2util.AbFile     `inject:""`
 
 	cmdMap map[string]Process
+
+	startWorkerFunc   func()
+	migrateWorkerFunc func()
 }
 
 //SetStartWorker ...
-func (g *G2cmd) SetStartWorker(fn func()) { g.cmdMap["startCmd"].(*startCmd).SetWorker(fn) }
+func (g *G2cmd) SetStartWorker(fn func()) { g.startWorkerFunc = fn }
 
 //SetMigrateWorker ...
-func (g *G2cmd) SetMigrateWorker(fn func()) { g.cmdMap["migrateCmd"].(*migrateCmd).runFunc = fn }
+func (g *G2cmd) SetMigrateWorker(fn func()) { g.migrateWorkerFunc = fn }
 
 //CmdMap ...
 func (g *G2cmd) CmdMap() map[string]Process { return g.cmdMap }
 
 //Constructor ...
-func (g *G2cmd) Constructor() {
-	g.cmdMap = make(map[string]Process)
-	g.RegisterCmd(&rootCmd{cmd: g})
-	g.RegisterCmd(&startCmd{cmd: g})
-	g.RegisterCmd(&stopCmd{cmd: g})
-	g.RegisterCmd(&restartCmd{cmd: g})
-	g.RegisterCmd(&migrateCmd{})
-}
+func (g *G2cmd) Constructor() { g.cmdMap = make(map[string]Process) }
 
 //binaryName ...
 func (g *G2cmd) binaryName() string {

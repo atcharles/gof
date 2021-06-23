@@ -35,7 +35,9 @@ func (s *startCmd) Run(*cobra.Command, []string) {
 	if !s.daemon {
 		//log.Printf("The pid at which the program is currently running is:👉 %d\n", os.Getpid())
 		s.cmd.Logger.Println(fmt.Sprintf("Program's PID:👉 %d", os.Getpid()))
-		s.worker()
+		if s.worker != nil {
+			s.worker()
+		}
 		return
 	}
 	binaryName := s.cmd.binaryName()
