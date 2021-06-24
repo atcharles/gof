@@ -27,6 +27,7 @@ type Application struct {
 	Gin      *g2gin.G2gin       `inject:""`
 	G2cmd    *g2cmd.G2cmd       `inject:""`
 	Mysql    *g2db.Mysql        `inject:""`
+	Token    *g2db.Token        `inject:""`
 
 	populateOnce sync.Once
 }

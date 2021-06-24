@@ -30,6 +30,7 @@ func main() {
 	opt := j2rpc.SnakeOption
 	opt.AddBeforeMiddleware(
 		[]string{`aa.api1`, `^aa\.\S+[1]$`},
+		[]string{`^aa\.open.*$`},
 		func(c context.Context, method string, w http.ResponseWriter, r *http.Request) (err error) {
 			spew.Dump(reflect.TypeOf(c).Elem().Name())
 			j2rpc.AbortWriteHeader(w, 401)

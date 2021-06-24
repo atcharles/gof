@@ -15,13 +15,19 @@ type Option struct {
 }
 
 //AddBeforeMiddleware ...
-func (o *Option) AddBeforeMiddleware(method []string, fn interface{}) {
-	o.BeforeMid = append(o.BeforeMid, middleInfo{method: method, function: fn})
+/**
+ * @Description:
+ * @receiver o
+ * @param method
+ * @param fn: //参数顺序: ctx,method,writer,request
+ */
+func (o *Option) AddBeforeMiddleware(method, excludes []string, fn interface{}) {
+	info := middleInfo{method: method, excludes: excludes, function: fn}
+	o.BeforeMid = append(o.BeforeMid, info)
 }
 
-//BeforeMiddlewareAction ...
-//参数顺序: ctx,method,writer,request
-func (o *Option) BeforeMiddlewareAction(args ...interface{}) (err error) {
+//beforeMiddlewareAction ...
+func (o *Option) beforeMiddlewareAction(args ...interface{}) (err error) {
 	if len(o.BeforeMid) == 0 {
 		return
 	}
@@ -67,9 +73,13 @@ func (o *Option) BeforeMiddlewareAction(args ...interface{}) (err error) {
 	if len(rst) == 0 {
 		return
 	}
+	er := rst[0]
+	if er.IsNil() {
+		return
+	}
 	//只能返回error
-	if isErrorType(rst[0].Type()) {
-		err = rst[0].Interface().(error)
+	if isErrorType(er.Type()) {
+		err, _ = er.Interface().(error)
 	}
 	return
 }

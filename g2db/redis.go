@@ -16,11 +16,8 @@ import (
 
 //constants defined
 const (
-	SYSKey                = "P6UEgd7ln9mpMz5hGWYqT21cSHOtkJQZ"
-	GinContextJWTKey      = "JWT"
-	GinContextJWTTokenKey = "JWT_RAW"
-	redisSubChannel       = "Sub"
-	redisSubDelMemCache   = "DelMemCache"
+	redisSubChannel     = "Sub"
+	redisSubDelMemCache = "DelMemCache"
 )
 
 type (

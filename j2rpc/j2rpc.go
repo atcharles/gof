@@ -242,9 +242,7 @@ func (s *server) prepareRequest(ctx context.Context, w http.ResponseWriter, r *h
 		elem[i] = s.formatName(CamelString(e2))
 	}
 	req.Method = strings.Join(elem, splitMethodSeparator)
-
-	err = s.opt.BeforeMiddlewareAction(ctx, req.Method, w, r)
-
+	err = s.opt.beforeMiddlewareAction(ctx, req.Method, w, r)
 	return
 }
 

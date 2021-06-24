@@ -30,9 +30,6 @@ func (g *G2gin) Constructor() { g.j2opt = j2rpc.SnakeOption }
 //SetJ2Service ...
 func (g *G2gin) SetJ2Service(j2Service interface{}) { g.j2Service = j2Service }
 
-//BeforeMiddleware ...
-func (g *G2gin) BeforeMiddleware(m []string, fn interface{}) { g.j2opt.AddBeforeMiddleware(m, fn) }
-
 //Run ...
 func (g *G2gin) Run() {
 	v := g.Config.Viper().GetStringMap("http_server")
@@ -49,9 +46,9 @@ func (g *G2gin) Run() {
 	g1 := eg.Group("/").Group(cast.ToString(v["api_root"]))
 	g.useLogger(g1)
 	g.useCors(g1)
+	g.useJ2rpc(g1)
 
 	g1.GET("/ping", func(c *gin.Context) { c.String(200, "pong") })
-	g.useJ2rpc(g1)
 
 	srv := &http.Server{
 		Addr:              cast.ToString(v["port"]),
