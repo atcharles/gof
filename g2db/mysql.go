@@ -86,11 +86,11 @@ func (m *Mysql) Insert(bean interface{}) (err error) {
 查询缓存原始数据
 合并新数据
 更新新数据
-:len(params)==1
+:len(params)>0
 查询原始数据
 合并params
 更新数据
-:len(params)==2
+:len(params)>1
 添加cols
  * @return err
 */
@@ -112,7 +112,7 @@ func (m *Mysql) Update(bean interface{}, params ...interface{}) (newBean interfa
 	}
 
 	var cols []string
-	if len(params) == 1 {
+	if len(params) > 0 {
 		mp, ok := params[0].(g2util.Map)
 		if !ok {
 			err = errors.New("first param must be a Map type")
@@ -123,7 +123,7 @@ func (m *Mysql) Update(bean interface{}, params ...interface{}) (newBean interfa
 		}
 	}
 
-	if len(params) == 2 {
+	if len(params) > 1 {
 		var ok bool
 		cols, ok = params[1].([]string)
 		if !ok {
