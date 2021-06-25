@@ -85,17 +85,9 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 //RegisterForApp ...
 func (s *server) RegisterForApp(app interface{}) {
-	v1 := g2util.ValueIndirect(reflect.ValueOf(app))
-	for i := 0; i < v1.NumField(); i++ {
-		f1 := v1.Field(i)
-		if !f1.CanSet() {
-			continue
-		}
-		vf1 := f1.Interface()
-		if f1.Kind() == reflect.Ptr && f1.IsNil() {
-			vf1 = reflect.New(f1.Type().Elem()).Interface()
-		}
-		s.Register(vf1)
+	namespaces := g2util.ObjectTagInstances(app, "j2rpc")
+	for _, namespace := range namespaces {
+		s.Register(namespace)
 	}
 }
 

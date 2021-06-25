@@ -1,5 +1,0 @@
-name: 'app'
-http_server:
-  api_root: '/api'
-  port: ':300'
-  mode: 'release' #release|debug
