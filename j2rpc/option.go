@@ -26,28 +26,13 @@ func (o *Option) AddBeforeMiddleware(method, excludes []string, fn interface{}) 
 	o.BeforeMid = append(o.BeforeMid, info)
 }
 
-//beforeMiddlewareAction ...
-func (o *Option) beforeMiddlewareAction(args ...interface{}) (err error) {
-	if len(o.BeforeMid) == 0 {
+//beforeMiddlewareFuncAction ...
+func (o *Option) beforeMiddlewareFuncAction(fn interface{}, args ...interface{}) (err error) {
+	if fn == nil {
 		return
 	}
 
-	method := args[1].(string)
-	_f1 := func() interface{} {
-		for _, info := range o.BeforeMid {
-			if fn := info.getMatchFunction(method); fn != nil {
-				return fn
-			}
-		}
-		return nil
-	}
-
-	func1 := _f1()
-	if func1 == nil {
-		return
-	}
-
-	fn1 := reflect.ValueOf(func1)
+	fn1 := reflect.ValueOf(fn)
 	if fn1.Kind() != reflect.Func {
 		return
 	}
@@ -80,6 +65,23 @@ func (o *Option) beforeMiddlewareAction(args ...interface{}) (err error) {
 	//只能返回error
 	if isErrorType(er.Type()) {
 		err, _ = er.Interface().(error)
+	}
+	return
+}
+
+//beforeMiddlewareAction ...
+func (o *Option) beforeMiddlewareAction(args ...interface{}) (err error) {
+	if len(o.BeforeMid) == 0 {
+		return
+	}
+
+	method := args[1].(string)
+	for _, info := range o.BeforeMid {
+		if fn := info.getMatchFunction(method); fn != nil {
+			if err = o.beforeMiddlewareFuncAction(fn, args...); err != nil {
+				return
+			}
+		}
 	}
 	return
 }

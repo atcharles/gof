@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/atcharles/gof/v2/g2util"
-) //defined GinContext ...
+)
 
 //constants defined
 const (
@@ -55,7 +55,7 @@ func (r *redisObj) AfterShutdown() {
 }
 
 //PubDelCache ...
-func (r *redisObj) PubDelCache(keys []string) error { return r.Pub(r.pubDelMemChannel(), keys) }
+func (r *redisObj) PubDelCache(keys []string) error { return r.Pub(r.pubDelMemName(), keys) }
 
 //Pub ...
 func (r *redisObj) Pub(name string, data interface{}) error {
@@ -79,7 +79,7 @@ func (r *redisObj) Subscribe() {
 	r.subHandlers = make(map[string]RedisSubHandlerFunc)
 	r.closeSub = make(chan struct{})
 	//rev handlers
-	r.SubHandle(r.pubDelMemChannel(), r.Cache.RedisSubDelCache())
+	r.SubHandle(r.pubDelMemName(), r.Cache.RedisSubDelCache())
 	if e := r.subscribe(); e != nil {
 		r.Logger.Fatalln(e)
 	}
@@ -164,7 +164,7 @@ func (r *redisObj) subChannel() string {
 	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), redisSubChannel)
 }
 
-//pubDelMemChannel ...
-func (r *redisObj) pubDelMemChannel() string {
+//pubDelMemName ...
+func (r *redisObj) pubDelMemName() string {
 	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), redisSubDelMemCache)
 }
