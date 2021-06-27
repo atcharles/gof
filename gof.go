@@ -60,7 +60,6 @@ func (a *Application) Run() {
 
 //RunServices ...
 func (a *Application) RunServices(val interface{}) {
-	g2util.InjectPopulate(val)
 	a.Gin.SetJ2Service(val)
 	a.Run()
 }
@@ -75,4 +74,19 @@ func (a *Application) RunWithCmd(fn ...func()) {
 		a.G2cmd.SetMigrateWorker(fn[1])
 	}
 	a.G2cmd.Execute()
+}
+
+//RunDefault ...
+func (a *Application) RunDefault(val interface{}) {
+	g2util.InjectPopulate(val, a.Default())
+	startFunc := func() {
+		a.Gin.SetJ2Service(val)
+		a.Run()
+	}
+	migrateFunc := func() {
+		db := a.Mysql
+		db.TableRegister(g2util.ObjectTagInstances(val, "migrate")...)
+		db.Migrate()
+	}
+	a.RunWithCmd(startFunc, migrateFunc)
 }

@@ -23,7 +23,7 @@ const (
 
 	GinContextJWTTokenKey = "JWT_RAW"
 
-	//GinContextJWTKey = "JWT"
+	GinContextJWTUIDKey = "JWT_UID"
 )
 
 //ItfGinContext ...
@@ -62,8 +62,8 @@ func (t *Token) AfterLogin(ctx context.Context, id int64) (td *TokenData, err er
 }
 
 //Verify ...
-func (t *Token) Verify(ctx ItfGinContext, fn func(id int64) error) (err error) {
-	return t.verify(ctx, fn)
+func (t *Token) Verify(ctx ItfGinContext, fns ...func() error) (err error) {
+	return t.verify(ctx, fns...)
 }
 
 //Logout ...
@@ -102,7 +102,7 @@ func (t *Token) write2redis(ctx context.Context, id int64) (td *TokenData, err e
 }
 
 //verify ...
-func (t *Token) verify(ctx ItfGinContext, fn func(id int64) error) (err error) {
+func (t *Token) verify(ctx ItfGinContext, fns ...func() error) (err error) {
 	token := ctx.GetHeader("token")
 	if len(token) == 0 {
 		token = ctx.GetHeader("Authorization")
@@ -126,7 +126,20 @@ func (t *Token) verify(ctx ItfGinContext, fn func(id int64) error) (err error) {
 	}
 
 	ctx.Set(GinContextJWTTokenKey, token)
-	err = fn(tt.ID)
+	ctx.Set(GinContextJWTUIDKey, tt.ID)
+
+	if len(fns) == 0 {
+		return
+	}
+
+	for _, fn := range fns {
+		if fn == nil {
+			continue
+		}
+		if err = fn(); err != nil {
+			return
+		}
+	}
 	return
 }
 

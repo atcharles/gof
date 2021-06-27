@@ -10,7 +10,7 @@ type middleInfo struct {
 	method []string
 	//排除的方法
 	excludes []string
-	//处理函数
+	//处理函数:参数顺序: ctx,method,writer,request
 	function interface{}
 }
 
