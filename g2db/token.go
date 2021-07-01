@@ -48,7 +48,7 @@ type Token struct {
 func (t *Token) Constructor() {
 	defaultTimeout := time.Hour * 24 * 10
 	t.option = &TokenOption{
-		CacheKey:   "h::token",
+		CacheKey:   "h:token",
 		Timeout:    defaultTimeout,
 		MaxRefresh: defaultTimeout / 2,
 		EncryptKey: []byte(SYSKey)[:16],
@@ -77,7 +77,7 @@ func (t *Token) redisCacheKey() string {
 	if len(name) == 0 {
 		return t.option.CacheKey
 	}
-	return fmt.Sprintf("%s::%s", name, t.option.CacheKey)
+	return fmt.Sprintf("%s:%s", name, t.option.CacheKey)
 }
 
 //redisField ...
