@@ -32,28 +32,21 @@ func writeResponse(w http.ResponseWriter, id json.RawMessage, rst ...interface{}
 
 //NewResponse ...
 func NewResponse(id json.RawMessage, rst ...interface{}) *RPCMessage {
-	var result json.RawMessage = nil
-	var e error = nil
-
+	var (
+		result json.RawMessage
+		err    *Error
+	)
 	if len(rst) > 0 {
 		_rst := rst[0]
 		switch _d1a := _rst.(type) {
 		case json.RawMessage:
 			result = _d1a
+		case *Error:
+			err = _d1a
 		case error:
-			e = _d1a
+			err = NewError(ErrServer, _d1a.Error())
 		default:
 			panic("types error")
-		}
-	}
-
-	var err *Error
-	if e != nil {
-		switch _e := e.(type) {
-		case *Error:
-			err = _e
-		default:
-			err = NewError(ErrServer, e.Error())
 		}
 	}
 	if len(id) == 0 {

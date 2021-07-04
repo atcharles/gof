@@ -88,7 +88,7 @@ func (c *callback) call(ctx context.Context, args []reflect.Value) (res interfac
 	if c.errPos >= 0 && !results[c.errPos].IsNil() {
 		// Method has returned non-nil error value.
 		err = results[c.errPos].Interface().(error)
-		return reflect.Value{}, NewError(ErrServer, err.Error())
+		return
 	}
 	return results[0].Interface(), err
 }

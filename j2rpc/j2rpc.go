@@ -205,7 +205,7 @@ func (s *server) Handler(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	req, err := s.prepareRequest(ctx, w, r)
 	if err != nil {
-		writeResponse(w, []byte{}, NewError(ErrParse, err.Error()))
+		writeResponse(w, []byte{}, err)
 		return
 	}
 
@@ -288,16 +288,11 @@ func (s *server) handle(ctx context.Context, msg *RPCMessage) (answer json.RawMe
 
 	res, err := cbk.call(ctx, callArgs)
 	if err != nil {
-		err = NewError(ErrServer, err.Error())
 		return
 	}
 	if res == nil {
 		return
 	}
 	answer, err = json.Marshal(res)
-	if err != nil {
-		err = NewError(ErrServer, err.Error())
-		return
-	}
 	return
 }
