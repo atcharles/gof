@@ -514,12 +514,13 @@ func (c *CompoundIndex) execCreate(table string) (err error) {
 //2020/3/30 22:11 -- Author:charles
 //func CacheTableName(table interface{}) string { return tableName(table) }
 func tableName(table interface{}) string {
-	tnBean, ok := table.(names.TableName)
+	/*tnBean, ok := table.(names.TableName)
 	if ok {
 		return tnBean.TableName()
 	}
 	val1 := reflect.Indirect(reflect.ValueOf(table))
-	return names.LintGonicMapper.Obj2Table(val1.Type().Name())
+	return names.LintGonicMapper.Obj2Table(val1.Type().Name())*/
+	return names.GetTableName(names.LintGonicMapper, reflect.ValueOf(table))
 }
 
 //fieldName 获取模型对象字段 => 数据库的字段名
