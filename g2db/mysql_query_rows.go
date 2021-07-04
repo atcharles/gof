@@ -63,6 +63,9 @@ func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *
 		return
 	}
 	rows = &MysqlRows{Data: data}
+	if sl.Elem().Len() == 0 {
+		return
+	}
 
 	count, err := db.Where(conditionStr).Count(val)
 	if err != nil {
