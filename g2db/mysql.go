@@ -107,7 +107,7 @@ func (m *Mysql) Update(bean interface{}, params ...interface{}) (newBean interfa
 		return
 	}
 
-	if err = g2util.MergeBeans(bean, newBean); err != nil {
+	if err = g2util.MergeBeans(newBean, bean); err != nil {
 		return
 	}
 

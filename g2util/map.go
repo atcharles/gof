@@ -11,11 +11,11 @@ import (
 //MergeBeans ...
 //合并结构数据
 func MergeBeans(dst interface{}, src interface{}) (err error) {
-	mpDst, err := Bean2Map(dst)
+	mpDst, err := Bean2Map(src)
 	if err != nil {
 		return
 	}
-	err = mpDst.Merge2Bean(src)
+	err = mpDst.Merge2Bean(dst)
 	return
 }
 
@@ -59,7 +59,7 @@ func (m Map) Merge2Bean(bean interface{}) (err error) {
 		return
 	}
 	m.MergeTo(mp)
-	err = m.ToBean(bean)
+	err = mp.ToBean(bean)
 	return
 }
 
