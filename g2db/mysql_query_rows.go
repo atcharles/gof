@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/atcharles/gof/v2/g2util"
 )
 
@@ -29,6 +31,25 @@ type (
 		MysqlAfterQueryRow()
 	}
 )
+
+//QueryTableRows ...
+func (m *Mysql) QueryTableRows(tableStr string, params *MysqlQueryRowsParams) (rows *MysqlRows, err error) {
+	val := func() interface{} {
+		m.mu.RLock()
+		defer m.mu.RUnlock()
+		for _, table := range m.tables {
+			if tableName(table) == tableStr {
+				return table
+			}
+		}
+		return nil
+	}()
+	if val == nil {
+		err = errors.Errorf("数据表%s不存在", tableStr)
+		return
+	}
+	return m.QueryRows(val, params)
+}
 
 //QueryRows ...
 func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *MysqlRows, err error) {

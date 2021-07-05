@@ -79,14 +79,9 @@ func (a *Application) RunWithCmd(fn ...func()) {
 //RunDefault ...
 func (a *Application) RunDefault(val interface{}) {
 	g2util.InjectPopulate(val, a.Default())
-	startFunc := func() {
-		a.Gin.SetJ2Service(val)
-		a.Run()
-	}
-	migrateFunc := func() {
-		db := a.Mysql
-		db.TableRegister(g2util.ObjectTagInstances(val, "migrate")...)
-		db.Migrate()
-	}
+	db := a.Mysql
+	db.TableRegister(g2util.ObjectTagInstances(val, "migrate")...)
+	startFunc := func() { a.Gin.SetJ2Service(val); a.Run() }
+	migrateFunc := func() { db.Migrate() }
 	a.RunWithCmd(startFunc, migrateFunc)
 }

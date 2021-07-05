@@ -27,7 +27,8 @@ func writeResponse(w http.ResponseWriter, id json.RawMessage, rst ...interface{}
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(bts)
+	n, err := w.Write(bts)
+	_, _ = n, err
 }
 
 //NewResponse ...
