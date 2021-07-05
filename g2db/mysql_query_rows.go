@@ -59,24 +59,29 @@ func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *
 	sl.Elem().Set(sl1)
 	data := sl.Interface()
 
+	if params.PageCount == 0 {
+		params.PageCount = 10
+	}
+	if len(params.OrderBy) == 0 {
+		params.OrderBy = "id"
+	}
+
 	sq := `select * from {{.table}} where {{.condition}} order by {{.orderBy}} {{.sort}} limit {{.offsetX}},{{.pageCount}}`
 	tpl := g2util.Map{
-		"orderBy":   "id",
+		"orderBy":   params.OrderBy,
 		"sort":      "desc",
 		"offsetX":   params.PageCount * (params.Page - 1),
 		"pageCount": params.PageCount,
 	}
+	if params.Asc {
+		tpl["sort"] = "asc"
+	}
+
 	tpl["table"] = tableName(val)
 	condition1 := []string{"1=1"}
 	condition1 = append(condition1, params.Conditions...)
 	conditionStr := strings.Join(condition1, " AND ")
 	tpl["condition"] = conditionStr
-	if len(params.OrderBy) > 0 {
-		tpl["orderBy"] = params.OrderBy
-	}
-	if params.Asc {
-		tpl["sort"] = "asc"
-	}
 
 	db := m.Engine()
 	sq = g2util.TextTemplateMustParse(sq, tpl)
