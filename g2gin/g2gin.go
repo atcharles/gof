@@ -1,6 +1,7 @@
 package g2gin
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -65,6 +66,9 @@ func (g *G2gin) Run() {
 func (g *G2gin) useJ2rpc(rg *gin.RouterGroup) {
 	jsv := j2rpc.New(g.j2opt)
 	jsv.Logger().SetOutput(gin.DefaultWriter)
+
+	jsv.Opt().AddBeforeMiddleware([]string{"^.*$"}, []string{}, func(c *gin.Context, method string) { c.Set("method", method) })
+
 	if g.j2Service != nil {
 		jsv.RegisterForApp(g.j2Service)
 
@@ -81,7 +85,39 @@ func (g *G2gin) useLogger(rg *gin.RouterGroup) {
 	webIO := g.AbFile.MustLogIO("web")
 	gin.DefaultWriter = webIO
 	gin.DefaultErrorWriter = webIO
-	rg.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: webIO}))
+
+	var defaultLogFormatter = func(param gin.LogFormatterParams) string {
+		var statusColor, methodColor, resetColor string
+		if param.IsOutputColor() {
+			statusColor = param.StatusCodeColor()
+			methodColor = param.MethodColor()
+			resetColor = param.ResetColor()
+		}
+
+		if param.Latency > time.Minute {
+			param.Latency = param.Latency.Truncate(time.Second)
+		}
+		return fmt.Sprintf("[GIN] %v | %s\n|%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
+			param.TimeStamp.Format("2006/01/02 - 15:04:05"),
+			param.Keys["method"],
+			statusColor,
+			param.StatusCode,
+			resetColor,
+			param.Latency,
+			param.ClientIP,
+			methodColor,
+			param.Method,
+			resetColor,
+			param.Path,
+			param.ErrorMessage,
+		)
+	}
+
+	rg.Use(gin.LoggerWithConfig(gin.LoggerConfig{
+		Formatter: defaultLogFormatter,
+		Output:    webIO,
+		SkipPaths: nil,
+	}))
 	rg.Use(gin.RecoveryWithWriter(webIO))
 }
 
