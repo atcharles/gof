@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -87,36 +86,28 @@ func (*cacheBind) cacheValString(v reflect.Value) string {
 //used for db get
 func (c *cacheBind) Values(bean interface{}, condition ...interface{}) []string {
 	qs := make([]string, 0)
-	switch len(condition) {
-	case 0:
-		mp := make(MapString)
-		mp.findAllCacheCondition(reflect.ValueOf(bean))
-		for k, v := range mp {
-			qs = append(qs, fmt.Sprintf("%s=%s", k, v))
-		}
-		sort.Strings(qs)
-		if ci, ok := bean.(ItfCompoundIndex); ok {
-			ci1qs := make([]string, 0)
-			for _, cia := range ci.CompoundIndexes() {
-				v := cia.makeQuery()
-				if len(v) > 0 {
-					ci1qs = append(ci1qs, v)
-				}
+	mp := make(MapString)
+	mp.findAllCacheCondition(reflect.ValueOf(bean))
+	for k, v := range mp {
+		qs = append(qs, fmt.Sprintf("%s=%s", k, v))
+	}
+	if ci, ok := bean.(ItfCompoundIndex); ok {
+		ci1qs := make([]string, 0)
+		for _, cia := range ci.CompoundIndexes() {
+			v := cia.makeQuery()
+			if len(v) > 0 {
+				ci1qs = append(ci1qs, v)
 			}
-			qs = append(qs, ci1qs...)
 		}
-	case 1:
-		switch v := condition[0].(type) {
-		case string:
-			qs = []string{v}
-		case []string:
-			qs = v
-		}
-	default:
+		qs = append(qs, ci1qs...)
+	}
+	if len(condition) > 0 {
 		for _, i := range condition {
 			switch v := i.(type) {
 			case string:
 				qs = append(qs, v)
+			case []string:
+				qs = append(qs, v...)
 			case fmt.Stringer:
 				qs = append(qs, v.String())
 			default:
@@ -124,6 +115,7 @@ func (c *cacheBind) Values(bean interface{}, condition ...interface{}) []string 
 			}
 		}
 	}
+	qs = gubrak.From(qs).OrderBy(func(each string) int { return len(each) }, true).Result().([]string)
 	return qs
 }
 

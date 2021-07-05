@@ -13,11 +13,11 @@ require (
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.2-0.20210603121251-34ce2104cad3
-	github.com/go-redis/redis/v8 v8.10.0
+	github.com/go-redis/redis/v8 v8.11.0
 	github.com/go-resty/resty/v2 v2.6.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/goccy/go-json v0.7.1
-	github.com/golang/snappy v0.0.3 // indirect
+	github.com/goccy/go-json v0.7.3
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gookit/goutil v0.3.14
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20210421033923-b50c8d7a9d5d
@@ -30,13 +30,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/cast v1.3.1
-	github.com/spf13/cobra v1.1.3
-	github.com/spf13/viper v1.8.0
+	github.com/spf13/cobra v1.2.1
+	github.com/spf13/viper v1.8.1
 	github.com/unknwon/com v1.0.1
-	go.opentelemetry.io/otel/internal/metric v0.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
-	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
+	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
 	xorm.io/builder v0.3.9 // indirect
-	xorm.io/xorm v1.1.0
+	xorm.io/xorm v1.1.2
 )

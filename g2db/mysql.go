@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/novalagung/gubrak/v2"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"xorm.io/xorm"
@@ -453,6 +454,7 @@ func (c *CompoundIndex) makeQuery() string {
 		}
 	}
 	sort.Strings(list)
+	list = gubrak.From(list).OrderBy(func(each string) int { return len(each) }, true).Result().([]string)
 	return strings.Join(list, " AND ")
 }
 
