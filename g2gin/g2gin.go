@@ -97,7 +97,7 @@ func (g *G2gin) useLogger(rg *gin.RouterGroup) {
 		if param.Latency > time.Minute {
 			param.Latency = param.Latency.Truncate(time.Second)
 		}
-		return fmt.Sprintf("[GIN] %v | %s\n|%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
+		return fmt.Sprintf("[GIN] %v | %#+v\n|%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
 			param.TimeStamp.Format("2006/01/02 - 15:04:05"),
 			param.Keys["method"],
 			statusColor,
