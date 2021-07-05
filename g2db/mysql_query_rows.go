@@ -74,7 +74,7 @@ func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *
 
 	rows.Pages = int(count) / params.PageCount
 	if int(count)%params.PageCount > 0 {
-		rows.Pages += 1
+		rows.Pages++
 	}
 
 	ss1 := sl.Elem()
