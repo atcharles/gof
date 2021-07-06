@@ -2,7 +2,6 @@ package g2db
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -12,12 +11,14 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/atcharles/gof/v2/g2util"
+	"github.com/atcharles/gof/v2/json"
 )
 
 //constants defined
 const (
 	redisSubChannel     = "Sub"
 	redisSubDelMemCache = "DelMemCache"
+	redisSubDelMemAll   = "DelMemAll"
 )
 
 type (
@@ -57,6 +58,9 @@ func (r *redisObj) AfterShutdown() {
 //PubDelCache ...
 func (r *redisObj) PubDelCache(keys []string) error { return r.Pub(r.pubDelMemName(), keys) }
 
+//PubDelMemAll ...
+func (r *redisObj) PubDelMemAll() error { return r.Pub(r.formatWithAppName(redisSubDelMemAll), nil) }
+
 //Pub ...
 func (r *redisObj) Pub(name string, data interface{}) error {
 	bd, err := json.Marshal(data)
@@ -80,6 +84,7 @@ func (r *redisObj) Subscribe() {
 	r.closeSub = make(chan struct{})
 	//rev handlers
 	r.SubHandle(r.pubDelMemName(), r.Cache.RedisSubDelCache())
+	r.SubHandle(r.formatWithAppName(redisSubDelMemAll), r.Cache.RedisSubDelMemAll())
 	if e := r.subscribe(); e != nil {
 		r.Logger.Fatalln(e)
 	}
@@ -105,7 +110,12 @@ func (r *redisObj) subAction(sub *redis.PubSub) {
 				continue
 			}
 			//run handlerFunc
-			r.Go.Submit(func() (err error) { r.subHandlers[payload.Name](*payload.Data); return })
+			payloadData := payload.Data
+			if payloadData == nil {
+				_d1 := make(json.RawMessage, 0)
+				payloadData = &_d1
+			}
+			r.Go.Submit(func() (err error) { r.subHandlers[payload.Name](*payloadData); return })
 		}
 	}
 }
@@ -167,4 +177,9 @@ func (r *redisObj) subChannel() string {
 //pubDelMemName ...
 func (r *redisObj) pubDelMemName() string {
 	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), redisSubDelMemCache)
+}
+
+//formatWithAppName ...
+func (r *redisObj) formatWithAppName(s string) string {
+	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), s)
 }

@@ -21,6 +21,17 @@ type cacheMem struct {
 	mu sync.RWMutex
 }
 
+//RedisSubDelMemAll ...
+func (c *cacheMem) RedisSubDelMemAll() RedisSubHandlerFunc {
+	return func(_ []byte) {
+		if e := c.Cache.Reset(); e != nil {
+			c.Logger.Errorf("清空缓存失败:%s", e.Error())
+			return
+		}
+		c.Logger.Debugf("内存缓存已清空")
+	}
+}
+
 //RedisSubDelCache ...
 func (c *cacheMem) RedisSubDelCache() RedisSubHandlerFunc {
 	var _fnDel = func(p []byte) (err error) {
