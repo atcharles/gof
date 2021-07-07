@@ -58,7 +58,7 @@ func (c *cacheMem) Constructor() {}
 
 //Atomic ...
 func (c *cacheMem) Atomic(key string, fn func()) {
-	mu := Locker.Load(key)
+	mu := Locker.Load(fmt.Sprintf("%s:%s", "cacheMem:Atomic", key))
 	mu.Lock()
 	fn()
 	mu.Unlock()
@@ -66,7 +66,7 @@ func (c *cacheMem) Atomic(key string, fn func()) {
 
 //GetOrStore ...
 func (c *cacheMem) GetOrStore(key string, fn func() ([]byte, error)) (data []byte, err error) {
-	c.Atomic(fmt.Sprintf("cacheMem:GetOrStore:%s", key), func() { data, err = c.getOrStore(key, fn) })
+	c.Atomic(key, func() { data, err = c.getOrStore(key, fn) })
 	return
 }
 
