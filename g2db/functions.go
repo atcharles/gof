@@ -42,14 +42,8 @@ func HasError(e error) (bool, error) {
 	if e == nil {
 		return true, e
 	}
-	if errors.As(e, new(ErrorMysqlNotFound)) {
+	if _, ok := e.(ErrorMysqlNotFound); ok || e == redis.Nil {
 		return false, nil
 	}
-	if e == redis.Nil {
-		return false, nil
-	}
-	if e != nil {
-		return false, e
-	}
-	return true, nil
+	return false, e
 }
