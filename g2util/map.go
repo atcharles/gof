@@ -121,3 +121,12 @@ func (m Map) GetBool(key string) bool {
 	a, _ := strconv.ParseBool(com.ToStr(val))
 	return a
 }
+
+//Keys ...
+func (m Map) Keys() []string {
+	list := make([]string, 0)
+	for k := range m {
+		list = append(list, k)
+	}
+	return list
+}
