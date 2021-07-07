@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/novalagung/gubrak/v2"
@@ -17,8 +16,6 @@ import (
 type cacheMem struct {
 	Logger g2util.LevelLogger `inject:""`
 	Cache  g2util.ItfCache    `inject:""`
-
-	mu sync.RWMutex
 }
 
 //RedisSubDelMemAll ...
@@ -60,13 +57,19 @@ func (c *cacheMem) RedisSubDelCache() RedisSubHandlerFunc {
 func (c *cacheMem) Constructor() {}
 
 //Atomic ...
-func (c *cacheMem) Atomic(fn func()) { c.mu.Lock(); fn(); c.mu.Unlock() }
+func (c *cacheMem) Atomic(key string, fn func()) {
+	mu := Locker.Load(key)
+	mu.Lock()
+	fn()
+	mu.Unlock()
+}
 
 //GetOrStore ...
 func (c *cacheMem) GetOrStore(key string, fn func() ([]byte, error)) (data []byte, err error) {
-	c.Atomic(func() { data, err = c.getOrStore(key, fn) })
+	c.Atomic(fmt.Sprintf("cacheMem:GetOrStore:%s", key), func() { data, err = c.getOrStore(key, fn) })
 	return
 }
+
 func (c *cacheMem) getOrStore(key string, fn func() ([]byte, error)) (data []byte, err error) {
 	ce := c.Cache
 	data, err = ce.Get(key)
