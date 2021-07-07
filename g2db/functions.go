@@ -3,6 +3,7 @@ package g2db
 import (
 	"fmt"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	"xorm.io/xorm"
 )
@@ -34,4 +35,21 @@ func initializeTables(table ItfInitData, sn *xorm.Session) (err error) {
 		return
 	}
 	return
+}
+
+//HasError ...
+func HasError(e error) (bool, error) {
+	if e == nil {
+		return true, e
+	}
+	if errors.As(e, new(ErrorMysqlNotFound)) {
+		return false, nil
+	}
+	if e == redis.Nil {
+		return false, nil
+	}
+	if e != nil {
+		return false, e
+	}
+	return true, nil
 }
