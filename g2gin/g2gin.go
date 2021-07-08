@@ -38,7 +38,6 @@ func (g *G2gin) Run() {
 	gin.SetMode(cast.ToString(v["mode"]))
 	gin.DisableConsoleColor()
 	eg := gin.New()
-	eg.AppEngine = true
 	err := eg.SetTrustedProxies([]string{"0.0.0.0/0"})
 	if err != nil {
 		log.Fatalln(err)
