@@ -12,11 +12,12 @@ require (
 	github.com/facebookgo/structtag v0.0.0-20150214074306-217e25fb9691 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-gonic/gin v1.7.2-0.20210603121251-34ce2104cad3
+	github.com/gin-gonic/gin v1.7.2-0.20210706083714-c7a28f853201
+	github.com/go-playground/validator/v10 v10.7.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/go-resty/resty/v2 v2.6.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/goccy/go-json v0.7.3
+	github.com/goccy/go-json v0.7.4
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gookit/goutil v0.3.14
 	github.com/henrylee2cn/ameda v1.4.10 // indirect

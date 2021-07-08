@@ -3,9 +3,16 @@ package g2db
 import (
 	"fmt"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-redis/redis/v8"
+	"github.com/gookit/goutil/dump"
 	"github.com/pkg/errors"
 	"xorm.io/xorm"
+)
+
+var (
+	_ = spew.Dump
+	_ = dump.P
 )
 
 //initializeTables 初始化数据表
