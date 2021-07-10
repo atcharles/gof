@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	_ "net/http/pprof" //pprof
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -59,6 +60,7 @@ func (g *G2gin) Run() {
 		IdleTimeout:       time.Second * 30,
 	}
 	g.Graceful.RegHTTPServer(srv)
+	g.profServer()
 }
 
 //useJ2rpc ...
@@ -142,4 +144,13 @@ func (g *G2gin) useCors(rg *gin.RouterGroup) {
 		AllowFiles:             false,
 	}
 	rg.Use(cors.New(_config))
+}
+
+//profServer ...
+func (g *G2gin) profServer() {
+	//go get -u github.com/google/pprof
+	//需要安装 graphviz
+	//pprof -http=:8080 http://127.0.0.1:301/debug/pprof/profile\?seconds\=10
+	srv := &http.Server{Addr: g.Config.Viper().GetString("global.pprof_port"), Handler: nil}
+	g.Graceful.RegHTTPServer(srv)
 }
