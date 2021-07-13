@@ -190,6 +190,10 @@ func (s *server) Handler(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if atomic.LoadInt32(&s.run) == 0 {
 		return
 	}
+	//检测是否已经写入header
+	if len(w.Header().Get("Status-Written")) != 0 {
+		return
+	}
 	if code, err := validateRequest(r); err != nil {
 		http.Error(w, err.Error(), code)
 		return
@@ -198,77 +202,40 @@ func (s *server) Handler(ctx context.Context, w http.ResponseWriter, r *http.Req
 	// from the declared content-type
 	w.Header().Set("x-content-type-options", "nosniff")
 
-	/*if r.Method != "POST" {
-		writeError(w, http.StatusMethodNotAllowed, "rpc: POST method required, received "+r.Method)
-		return
-	}*/
-
-	req, err := s.prepareRequest(ctx, w, r)
-	if err != nil {
-		writeResponse(w, []byte{}, err)
-		return
+	msg := new(RPCMessage)
+	if err := s.handle(ctx, w, r, msg); err != nil {
+		msg = msg.setError(err)
 	}
-
-	answer, err := s.handle(ctx, req)
-	if err != nil {
-		writeResponse(w, req.ID, err)
-		return
-	}
-	writeResponse(w, req.ID, answer)
+	msg.output().writeResponse(w)
 }
 
-//prepareRequest ...
-func (s *server) prepareRequest(ctx context.Context, w http.ResponseWriter, r *http.Request) (req *RPCMessage, err error) {
-	req = new(RPCMessage)
-	err = json.NewDecoder(r.Body).Decode(req)
+//handle ...
+func (s *server) handle(ctx context.Context, w http.ResponseWriter, r *http.Request, msg *RPCMessage) (err error) {
+	err = json.NewDecoder(r.Body).Decode(msg)
 	_ = r.Body.Close()
 	if err != nil {
 		return
 	}
-	elem, err := req.methods()
-	if err != nil {
-		return
-	}
 
-	for i, e2 := range elem {
-		elem[i] = s.formatName(CamelString(e2))
-	}
-	req.Method = strings.Join(elem, splitMethodSeparator)
-	err = s.opt.beforeMiddlewareAction(ctx, req.Method, w, r)
-	return
-}
-
-//stack ...
-func (s *server) stack(recover interface{}, methodName string) error {
-	msg := fmt.Sprintf("RPC method %s handler crashed: %v", methodName, recover)
-	const size = 64 << 10
-	buf := make([]byte, size)
-	buf = buf[:runtime.Stack(buf, false)]
-	s.logger.Errorf("%s\n%s", msg, buf)
-	return NewError(ErrInternal, msg)
-}
-
-//handle ...
-func (s *server) handle(ctx context.Context, msg *RPCMessage) (answer json.RawMessage, err error) {
 	if !msg.hasValidID() {
 		err = NewError(ErrInvalidRequest, "id is invalid")
 		return
 	}
-
 	elem, err := msg.methods()
 	if err != nil {
 		return
 	}
+	for i, e2 := range elem {
+		elem[i] = s.formatName(CamelString(e2))
+	}
+	msg.Method = strings.Join(elem, splitMethodSeparator)
 
-	svs, ok := s.services[elem[0]]
-	if !ok {
-		err = NewError(ErrNoMethod, "no namespace")
+	cbk, err := s.getCallBack(elem)
+	if err != nil {
 		return
 	}
 
-	cbk, ok := svs.callbacks[elem[1]]
-	if !ok {
-		err = NewError(ErrNoMethod, "no method")
+	if err = s.opt.beforeMiddlewareAction(ctx, msg.Method, w, r); err != nil {
 		return
 	}
 
@@ -290,9 +257,36 @@ func (s *server) handle(ctx context.Context, msg *RPCMessage) (answer json.RawMe
 	if err != nil {
 		return
 	}
-	if res == nil {
+	answer, err := json.Marshal(res)
+	if err != nil {
 		return
 	}
-	answer, err = json.Marshal(res)
+	msg.Result = answer
+	return
+}
+
+//stack ...
+func (s *server) stack(recover interface{}, methodName string) error {
+	msg := fmt.Sprintf("RPC method %s handler crashed: %v", methodName, recover)
+	const size = 64 << 10
+	buf := make([]byte, size)
+	buf = buf[:runtime.Stack(buf, false)]
+	s.logger.Errorf("%s\n%s", msg, buf)
+	return NewError(ErrInternal, msg)
+}
+
+//getCallBack ...
+func (s *server) getCallBack(elem []string) (cbk callback, err error) {
+	svs, ok := s.services[elem[0]]
+	if !ok {
+		err = NewError(ErrNoMethod, "no namespace")
+		return
+	}
+
+	cbk, ok = svs.callbacks[elem[1]]
+	if !ok {
+		err = NewError(ErrNoMethod, "no method")
+		return
+	}
 	return
 }

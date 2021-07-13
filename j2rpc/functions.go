@@ -68,12 +68,6 @@ func parseArgumentArray(dec *json.Decoder, types []reflect.Type) ([]reflect.Valu
 }
 
 //------------------------------ [segmentation] --------------------------------
-/*func unPointerType(vv reflect.Type) reflect.Type {
-	for vv.Kind() == reflect.Ptr {
-		vv = vv.Elem()
-	}
-	return vv
-}*/
 
 func isErrorType(t reflect.Type) bool {
 	for t.Kind() == reflect.Ptr {
@@ -84,8 +78,14 @@ func isErrorType(t reflect.Type) bool {
 
 func writeError(w http.ResponseWriter, status int, msg string) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(status)
+	AbortWriteHeader(w, status)
 	_, _ = fmt.Fprint(w, msg)
+}
+
+//AbortWriteHeader ...
+func AbortWriteHeader(w http.ResponseWriter, code int) {
+	w.WriteHeader(code)
+	w.Header().Set("Status-Written", "1")
 }
 
 // SnakeString converts the accepted string to a snake string (XxYy to xx_yy)

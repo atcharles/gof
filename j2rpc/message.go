@@ -7,55 +7,6 @@ import (
 	"github.com/atcharles/gof/v2/json"
 )
 
-//AbortWriteHeader ...
-func AbortWriteHeader(w http.ResponseWriter, code int) {
-	w.WriteHeader(code)
-	w.Header().Set("Status-Written", "1")
-}
-
-//writeResponse ...
-func writeResponse(w http.ResponseWriter, id json.RawMessage, rst ...interface{}) {
-	if len(w.Header().Get("Status-Written")) != 0 {
-		return
-	}
-
-	response := NewResponse(id, rst...)
-	bts, err := json.Marshal(response)
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	n, err := w.Write(bts)
-	_, _ = n, err
-}
-
-//NewResponse ...
-func NewResponse(id json.RawMessage, rst ...interface{}) *RPCMessage {
-	var (
-		result json.RawMessage
-		err    *Error
-	)
-	if len(rst) > 0 {
-		_rst := rst[0]
-		switch _d1a := _rst.(type) {
-		case json.RawMessage:
-			result = _d1a
-		case *Error:
-			err = _d1a
-		case error:
-			err = NewError(ErrServer, _d1a.Error())
-		default:
-			panic("types error")
-		}
-	}
-	if len(id) == 0 {
-		id = []byte("1")
-	}
-	return &RPCMessage{ID: id, Version: vsn, Result: result, Error: err}
-}
-
 // RPCMessage A value of this type can a JSON-RPC request, notification, successful response or
 //error response. Which one it is depends on the fields.
 type RPCMessage struct {
@@ -65,6 +16,52 @@ type RPCMessage struct {
 	Params  json.RawMessage `json:"params,omitempty"`
 	Result  json.RawMessage `json:"result,omitempty"`
 	Error   *Error          `json:"error,omitempty"`
+}
+
+//writeResponse ...
+func (r *RPCMessage) writeResponse(w http.ResponseWriter) {
+	if len(w.Header().Get("Status-Written")) != 0 {
+		return
+	}
+
+	bts, err := json.Marshal(r)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	AbortWriteHeader(w, http.StatusOK)
+	n, err := w.Write(bts)
+	_, _ = n, err
+}
+
+//output ...
+func (r *RPCMessage) output() *RPCMessage {
+	if len(r.ID) == 0 {
+		r.ID = []byte{'1'}
+	}
+	r.Version = vsn
+	r.Method = ""
+	r.Params = nil
+	return r
+}
+
+//setError ...
+func (r *RPCMessage) setError(err error) *RPCMessage {
+	if err == nil {
+		return r
+	}
+	var e *Error
+	switch _d1a := err.(type) {
+	case *Error:
+		e = _d1a
+	case error:
+		e = NewError(ErrServer, _d1a.Error())
+	default:
+		panic("types error")
+	}
+	r.Error = e
+	return r
 }
 
 //namespace ...returns the service's name
