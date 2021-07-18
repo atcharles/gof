@@ -17,11 +17,11 @@ func BuildInfoInstanceAdd(info g2util.Map) {
 }
 
 func showVersion() {
-	verStr := `版本信息:------------------------------
+	verStr := `------------------------------版本信息------------------------------
 Application: {{.appName}}
 Version: {{.version}}
 BuildTime: {{.buildTime}}
 {{.goVersion}}
-`
+git: {{.gitBranch}} - {{.gitHash}}`
 	fmt.Println(g2util.TextTemplateMustParse(verStr, BuildInfoInstance))
 }
