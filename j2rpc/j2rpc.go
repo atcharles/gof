@@ -257,6 +257,9 @@ func (s *server) handle(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return
 	}
+	if res == nil {
+		return
+	}
 	answer, err := json.Marshal(res)
 	if err != nil {
 		return
