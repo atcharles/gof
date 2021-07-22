@@ -73,16 +73,16 @@ func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *
 		params.TimeColumn = "created"
 	}
 
-	sq := `SELECT * FROM {{.table}} WHERE ({{.condition}}) ORDER BY {{.orderBy}} {{.sort}} 
-LIMIT {{.offsetX}},{{.pageCount}}`
+	sq := `SELECT * FROM` + " `{{.table}}` " + ` WHERE ({{.condition}}) 
+ORDER BY {{.orderBy}} {{.sort}} LIMIT {{.offsetX}},{{.pageCount}}`
 	tpl := g2util.Map{
 		"orderBy":   params.OrderBy,
-		"sort":      "desc",
+		"sort":      "DESC",
 		"offsetX":   params.PageCount * (params.Page - 1),
 		"pageCount": params.PageCount,
 	}
 	if params.Asc {
-		tpl["sort"] = "asc"
+		tpl["sort"] = "ASC"
 	}
 
 	tpl["table"] = tableName(val)
