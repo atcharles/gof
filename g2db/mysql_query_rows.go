@@ -1,6 +1,7 @@
 package g2db
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -59,14 +60,21 @@ func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *
 	sl.Elem().Set(sl1)
 	data := sl.Interface()
 
+	if params.Page == 0 {
+		params.Page = 1
+	}
 	if params.PageCount == 0 {
 		params.PageCount = 10
 	}
 	if len(params.OrderBy) == 0 {
 		params.OrderBy = "id"
 	}
+	if len(params.TimeColumn) == 0 {
+		params.TimeColumn = "created"
+	}
 
-	sq := `select * from {{.table}} where {{.condition}} order by {{.orderBy}} {{.sort}} limit {{.offsetX}},{{.pageCount}}`
+	sq := `SELECT * FROM {{.table}} WHERE ({{.condition}}) ORDER BY {{.orderBy}} {{.sort}} 
+LIMIT {{.offsetX}},{{.pageCount}}`
 	tpl := g2util.Map{
 		"orderBy":   params.OrderBy,
 		"sort":      "desc",
@@ -80,6 +88,15 @@ func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *
 	tpl["table"] = tableName(val)
 	condition1 := []string{"1=1"}
 	condition1 = append(condition1, params.Conditions...)
+	if len(params.TimeBetween) > 0 {
+		ts := strings.Split(params.TimeBetween, ",")
+		if len(ts) == 2 {
+			condition1 = append(
+				condition1,
+				fmt.Sprintf("(`%s` BETWEEN '%s' AND '%s')", params.TimeColumn, ts[0], ts[1]),
+			)
+		}
+	}
 	conditionStr := strings.Join(condition1, " AND ")
 	tpl["condition"] = conditionStr
 
