@@ -295,7 +295,7 @@ func (m *Mysql) Migrate() {
 			log.Fatalln(e)
 		}
 	})
-	log.Printf("数据初始化完成,use:%s", d)
+	log.Printf("数据初始化完成,use:%s\n", d)
 }
 
 func (m *Mysql) migrate() (err error) {
@@ -343,8 +343,8 @@ func (m *Mysql) getOut() io.Writer {
 	return m.out
 }
 
-//dbName ...
-func (m *Mysql) dbName() string {
+//DbName ...
+func (m *Mysql) DbName() string {
 	v := m.Config.Viper()
 	db := v.GetString("mysql.db")
 	if len(db) == 0 {
@@ -363,7 +363,7 @@ func (m *Mysql) getDataSource(args ...bool) string {
 
 	v := m.Config.Viper()
 	dsn := v.GetString("mysql.dsn")
-	db := m.dbName()
+	db := m.DbName()
 	dsn = strings.Replace(dsn, "{host}", v.GetString("global.host"), -1)
 	if withDB {
 		return strings.Replace(dsn, "{db}", db, -1)
@@ -416,7 +416,21 @@ func (m *Mysql) dial() (err error) {
 	return
 }
 
+//DropDatabase ...
+func (m *Mysql) DropDatabase() (err error) {
+	log.Println("删除数据库")
+	sq := fmt.Sprintf(`DROP DATABASE IF EXISTS %s;`, m.DbName())
+	return m.ExecSqOnNewEngine(sq)
+}
+
 func (m *Mysql) createDB() (err error) {
+	log.Println("创建数据库")
+	createDBSql := fmt.Sprintf(`CREATE DATABASE IF NOT EXISTS %s;`, m.DbName())
+	return m.ExecSqOnNewEngine(createDBSql)
+}
+
+//ExecSqOnNewEngine ...
+func (m *Mysql) ExecSqOnNewEngine(sq string) (err error) {
 	dataSource := m.getDataSource(false)
 	dba, err := xorm.NewEngine("mysql", dataSource)
 	if err != nil {
@@ -425,9 +439,7 @@ func (m *Mysql) createDB() (err error) {
 	defer func() {
 		_ = dba.Close()
 	}()
-	db := m.dbName()
-	createDBSql := fmt.Sprintf(`CREATE DATABASE IF NOT EXISTS %s;`, db)
-	_, err = dba.Exec(createDBSql)
+	_, err = dba.Exec(sq)
 	return
 }
 

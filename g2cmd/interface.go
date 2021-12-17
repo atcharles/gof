@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"reflect"
 
+	"github.com/atcharles/gof/v2/g2db"
 	"github.com/spf13/cobra"
 
 	"github.com/atcharles/gof/v2/g2util"
@@ -15,6 +16,7 @@ type G2cmd struct {
 	Logger g2util.LevelLogger `inject:""`
 	Config *g2util.Config     `inject:""`
 	AbFile *g2util.AbFile     `inject:""`
+	Mysql  *g2db.Mysql        `inject:""`
 
 	cmdMap map[string]Process
 

@@ -9,14 +9,15 @@ import (
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func (g *G2cmd) Execute() {
-	BuildInfoInstanceAdd(g2util.Map{"appName": g.Config.Viper().GetString("name")})
-	g.RegisterCmd(&rootCmd{cmd: g})
+	BuildInfoInstanceAdd(g2util.Map{"appName": g.Config.AppName()})
+	root1 := &rootCmd{cmd: g}
+	g.RegisterCmd(root1)
 	g.RegisterCmd(&startCmd{cmd: g, worker: g.startWorkerFunc})
 	g.RegisterCmd(&stopCmd{cmd: g})
 	g.RegisterCmd(&restartCmd{cmd: g})
-	g.RegisterCmd(&migrateCmd{runFunc: g.migrateWorkerFunc})
+	g.RegisterCmd(&migrateCmd{cmd: g, runFunc: g.migrateWorkerFunc})
 
-	root := g.cmdMap["rootCmd"].Cmd()
+	root := root1.Cmd()
 	for _, process := range g.cmdMap {
 		root.AddCommand(process.Cmd())
 	}
