@@ -79,6 +79,7 @@ func (g *G2gin) useJ2rpc(rg *gin.RouterGroup) {
 			ginRouter.J2rpc(jsv)
 		}
 	}
+	rg.Use(midAddRequestID)
 	rg.Any("/jsonrpc", func(c *gin.Context) { jsv.Handler(c, c.Writer, c.Request) })
 }
 
