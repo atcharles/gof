@@ -57,6 +57,8 @@ func (r *RPCMessage) setError(err error) *RPCMessage {
 		e = _e
 	case TokenError:
 		e = NewError(ErrAuthorization, _e.Error())
+	case ForbiddenError:
+		e = NewError(ErrForbidden, _e.Error())
 	default:
 		e = NewError(ErrServer, _e.Error())
 	}

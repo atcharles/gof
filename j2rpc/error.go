@@ -11,7 +11,9 @@ const (
 	ErrBadParams      ErrorCode = -32602
 	ErrInternal       ErrorCode = -32603
 	ErrServer         ErrorCode = -32000
-	ErrAuthorization  ErrorCode = 401
+
+	ErrAuthorization ErrorCode = 401
+	ErrForbidden     ErrorCode = 403
 )
 
 //Error ... Error codes
@@ -32,7 +34,13 @@ func NewError(code ErrorCode, Msg string, data ...interface{}) *Error {
 	return ee
 }
 
-//TokenError ...
-type TokenError string
+type (
+	//TokenError ...
+	TokenError string
+	//ForbiddenError ...
+	ForbiddenError string
+)
 
 func (t TokenError) Error() string { return string(t) }
+
+func (e ForbiddenError) Error() string { return string(e) }
