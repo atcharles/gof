@@ -212,11 +212,11 @@ func (s *server) Handler(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if err := s.handle(ctx, w, r, msg); err != nil {
 		msg = msg.setError(err)
 	}
+	msg.output().writeResponse(w)
 	requestID := w.Header().Get("request-id")
 	if len(requestID) > 0 {
 		s.logger.Debugf("[Request-ID:%s] %s", requestID, g2util.JSONDump(msg))
 	}
-	msg.output().writeResponse(w)
 }
 
 //handle ...
