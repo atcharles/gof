@@ -103,6 +103,9 @@ func (s *server) Register(receiver interface{}, names ...string) {
 		if len(names) > 0 && len(names[0]) > 0 {
 			name = names[0]
 		}
+		if nsn1, ok := rv.(ItfNamespaceName); ok {
+			name = nsn1.J2rpcNamespaceName()
+		}
 		if len(name) == 0 {
 			name = s.formatName(rvv.Type().Name())
 		}

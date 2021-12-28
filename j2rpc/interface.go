@@ -24,6 +24,10 @@ type (
 		Handler(ctx context.Context, w http.ResponseWriter, r *http.Request)
 		Stop()
 	}
+	//ItfNamespaceName ...
+	ItfNamespaceName interface {
+		J2rpcNamespaceName() string
+	}
 )
 
 //PopulateConstructor ...

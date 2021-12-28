@@ -27,6 +27,8 @@ var MiddlewareLimiter = func(conf *g2util.Config) gin.HandlerFunc {
 }
 
 var midAddRequestID gin.HandlerFunc = func(c *gin.Context) {
-	c.Header("request-id", g2util.ShortUUID())
+	if gin.IsDebugging() {
+		c.Header("request-id", g2util.ShortUUID())
+	}
 	c.Next()
 }
