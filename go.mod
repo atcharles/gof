@@ -9,11 +9,11 @@ require (
 	github.com/didip/tollbooth/v6 v6.1.1
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/facebookgo/inject v0.0.0-20180706035515-f23751cae28b
-	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-contrib/cors v1.3.2-0.20220101123631-6fb0a95dc529
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
-	github.com/go-playground/validator/v10 v10.9.0
+	github.com/go-playground/validator/v10 v10.10.0
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/go-sql-driver/mysql v1.6.0

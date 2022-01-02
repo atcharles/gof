@@ -150,10 +150,10 @@ func (g *G2gin) useLogger(rg *gin.RouterGroup) {
 //useCors ...
 func (g *G2gin) useCors(rg *gin.RouterGroup) {
 	_config := cors.Config{
-		AllowAllOrigins: false,
-		AllowOrigins:    nil,
+		//AllowAllOrigins: true,
+		//AllowOrigins:    []string{},
 		AllowOriginFunc: func(origin string) bool { return true },
-		AllowMethods:    []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
+		AllowMethods:    []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders: []string{
 			"Origin", "Content-Length", "Content-Type",
 			"Accept-Encoding", "Authorization", "X-Request-ID",
