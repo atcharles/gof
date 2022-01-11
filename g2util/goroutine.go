@@ -42,7 +42,7 @@ type goFunc func() (err error)
 func (g *GoPool) goFuncDo(fn goFunc) {
 	if e := fn(); e != nil {
 		//g.LevelLogger.Warnf("Goroutine worker exits with a error: %s\n\n", e.Error())
-		g.LevelLogger.Errorf("[Goroutine] %s\n%s\n", e.Error(), debug.Stack())
+		g.LevelLogger.Errorf("[Goroutine] %s\n%+v\n%s\n", e.Error(), e, debug.Stack())
 	}
 }
 
