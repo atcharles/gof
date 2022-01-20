@@ -396,7 +396,7 @@ func (m *Mysql) dial() (err error) {
 		case "debug":
 			return log2.LOG_DEBUG
 		case "info":
-			return log2.LOG_DEBUG
+			return log2.LOG_INFO
 		default:
 			return log2.LOG_OFF
 		}
