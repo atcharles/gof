@@ -384,25 +384,26 @@ func (m *Mysql) dial() (err error) {
 	e.SetDisableGlobalCache(!cast.ToBool(valMap["use_cache"]))
 	e.SetMapper(names.LintGonicMapper)
 
-	e.SetLogLevel(log2.LOG_OFF)
-	if cast.ToBool(valMap["show_sql"]) {
-		e.SetLogger(log2.NewSimpleLogger(m.GetOut()))
-		e.ShowSQL(true)
-		_logLevel := func() log2.LogLevel {
-			lvl := v.GetString("mysql.log_level")
-			switch lvl {
-			case "warn", "warning":
-				return log2.LOG_WARNING
-			case "error":
-				return log2.LOG_ERR
-			case "debug":
-				return log2.LOG_DEBUG
-			default:
-				return log2.LOG_INFO
-			}
+	//e.SetLogLevel(log2.LOG_OFF)
+	e.SetLogger(log2.NewSimpleLogger(m.GetOut()))
+	_logLevel := func() log2.LogLevel {
+		lvl := v.GetString("mysql.log_level")
+		switch lvl {
+		case "warn", "warning":
+			return log2.LOG_WARNING
+		case "error":
+			return log2.LOG_ERR
+		case "debug":
+			return log2.LOG_DEBUG
+		case "info":
+			return log2.LOG_DEBUG
+		default:
+			return log2.LOG_OFF
 		}
-		e.SetLogLevel(_logLevel())
 	}
+	e.SetLogLevel(_logLevel())
+	e.ShowSQL(cast.ToBool(valMap["show_sql"]))
+
 	e.SetConnMaxLifetime(cast.ToDuration(valMap["max_conn_lifetime_seconds"]) * time.Second)
 	e.SetMaxIdleConns(cast.ToInt(valMap["max_idle_connections"]))
 	e.SetMaxOpenConns(cast.ToInt(valMap["max_open_connections"]))
