@@ -40,21 +40,24 @@ var (
 //GinHandler ...
 func GinHandler(fn interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if err := parseArgumentFromContext(fn, c); err != nil {
-			JSONP(c, 500, err.Error())
+		val, err := parseArgumentFromContext(fn, c)
+		if err != nil {
+			_ = c.Error(err)
+			JSONP(c, 400, err.Error())
 			return
 		}
+		JSONP(c, 200, val)
 	}
 }
 
-func parseArgumentFromContext(fn interface{}, c *gin.Context) (err error) {
+func parseArgumentFromContext(fn interface{}, c *gin.Context) (val interface{}, err error) {
 	fnv := reflect.ValueOf(fn)
 	if fnv.Kind() != reflect.Func {
-		return errors.Errorf("need func type")
+		return nil, errors.Errorf("need func type")
 	}
 	numIn := fnv.Type().NumIn()
 	if numIn > 2 {
-		return errors.Errorf("too many arguments, want at most 2")
+		return nil, errors.Errorf("too many arguments, want at most 2")
 	}
 	args := make([]reflect.Value, 0)
 	for i := 0; i < fnv.Type().NumIn(); i++ {
@@ -82,22 +85,20 @@ func parseArgumentFromContext(fn interface{}, c *gin.Context) (err error) {
 	switch len(results) {
 	case 1:
 		if results[0].Type().Implements(errorType) {
-			if e := value2err(results[0]); e != nil {
-				JSONP(c, 400, e.Error())
+			if err = value2err(results[0]); err != nil {
 				return
 			}
-			JSONP(c, 200, "OK")
+			val = "OK"
 			return
 		}
-		JSONP(c, 200, results[0].Interface())
+		val = results[0].Interface()
 	case 2:
-		if e := value2err(results[1]); e != nil {
-			JSONP(c, 400, e.Error())
+		if err = value2err(results[1]); err != nil {
 			return
 		}
-		JSONP(c, 200, results[0].Interface())
+		val = results[0].Interface()
 	default:
-		JSONP(c, 200, "OK")
+		val = "OK"
 	}
 	return
 }

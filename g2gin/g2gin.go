@@ -39,11 +39,10 @@ func (g *G2gin) Run() {
 	v := g.Config.Viper().GetStringMap("http_server")
 	gin.SetMode(cast.ToString(v["mode"]))
 	gin.DisableConsoleColor()
+	gin.DefaultWriter = g.AbFile.MustLogIO("web")
+	gin.DefaultErrorWriter = gin.DefaultWriter
 	eg := gin.New()
-	/*err := eg.SetTrustedProxies([]string{"0.0.0.0/0"})
-	if err != nil {
-		log.Fatalln(err)
-	}*/
+	eg.Use(gin.Recovery())
 	const pathPrefix = "/"
 	g1 := eg.Group(pathPrefix)
 	g1.Use(MiddlewareLimiter(g.Config))
@@ -51,7 +50,6 @@ func (g *G2gin) Run() {
 		g1 = g1.Group(pathPrefix + apiRoot)
 	}
 	g1.Use(g.copyRequestBody())
-	g.useLogger(g1)
 	g.useCors(g1)
 	g.useJ2rpc(g1)
 	srv := &http.Server{
@@ -98,12 +96,12 @@ func (g *G2gin) copyRequestBody() gin.HandlerFunc {
 	}
 }
 
-//useLogger ...
-func (g *G2gin) useLogger(rg *gin.RouterGroup) {
-	webIO := g.AbFile.MustLogIO("web")
-	gin.DefaultWriter = webIO
-	gin.DefaultErrorWriter = webIO
-
+//UseLogger ...
+func (g *G2gin) UseLogger(rg *gin.RouterGroup, writer io.Writer, skipPaths []string) {
+	webIO := gin.DefaultWriter
+	if writer != nil {
+		webIO = writer
+	}
 	var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 		if param.Latency > time.Minute {
 			param.Latency = param.Latency.Truncate(time.Second)
@@ -138,13 +136,11 @@ func (g *G2gin) useLogger(rg *gin.RouterGroup) {
 		buf.WriteString("\n\n")
 		return buf.String()
 	}
-
 	rg.Use(gin.LoggerWithConfig(gin.LoggerConfig{
 		Formatter: defaultLogFormatter,
 		Output:    webIO,
-		SkipPaths: nil,
+		SkipPaths: skipPaths,
 	}))
-	rg.Use(gin.RecoveryWithWriter(webIO))
 }
 
 //useCors ...
