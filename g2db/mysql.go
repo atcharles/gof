@@ -69,146 +69,29 @@ func (m *Mysql) Dial() {
 
 //Insert ...
 func (m *Mysql) Insert(bean interface{}) error {
-	return m.TXCallback(func(sn *xorm.Session) (err error) {
-		if v1, ok := bean.(ItfSessionBeforeInsert); ok {
-			if err = v1.SessionBeforeInsert(sn); err != nil {
-				return
-			}
-		}
-		a, err := sn.InsertOne(bean)
-		if err != nil {
-			return
-		}
-		if a == 0 {
-			return errors.New("数据写入失败")
-		}
-		if err = m.DelCache(bean); err != nil {
-			return
-		}
-		if v1, ok := bean.(ItfSessionAfterInsert); ok {
-			if err = v1.SessionAfterInsert(sn); err != nil {
-				return
-			}
-		}
-		return
-	})
+	return m.TXCallback(func(sn *xorm.Session) error { return m.Session(sn).Insert(bean) })
 }
 
 //Update ...
-//@Description:
-//@receiver m
-//@param bean
-//@param params
-//@return newBean
-//@return err
 func (m *Mysql) Update(bean interface{}, params ...interface{}) (newBean interface{}, err error) {
-	newBean, err = g2util.CopyBean(bean)
-	if err != nil {
-		return
-	}
-	if err = m.CacheGet(newBean); err != nil {
-		return
-	}
-
-	if err = g2util.MergeBeans(newBean, bean); err != nil {
-		return
-	}
-
-	var (
-		cols       []string
-		queryAfter bool
-	)
-	if len(params) > 0 {
-		for _, param := range params {
-			switch val := param.(type) {
-			case g2util.Map:
-				if err = val.Merge2Bean(newBean); err != nil {
-					return
-				}
-			case []string:
-				cols = val
-			case bool:
-				queryAfter = val
-			}
-		}
-	}
-
-	queryList := new(cacheBind).Values(newBean)
-	if len(queryList) == 0 {
-		return
-	}
-
-	_f1 := func(sn *xorm.Session) *xorm.Session {
-		sn = sn.NoAutoCondition().Where(queryList[0])
-		if len(cols) == 0 {
-			return sn.UseBool().AllCols()
-		}
-		return sn.Cols(cols...)
-	}
 	err = m.TXCallback(func(sn *xorm.Session) error {
-		var e error
-		if v, ok := newBean.(ItfSessionBeforeUpdate); ok {
-			if e = v.SessionBeforeUpdate(sn); e != nil {
-				return e
-			}
-		}
-		a, e := _f1(sn).Update(newBean)
+		v, e := m.Session(sn).Update(bean, params...)
 		if e != nil {
 			return e
 		}
-		if a == 0 {
-			return errors.New("未更新数据")
-		}
-		//更新,删除新条件缓存
-		if e = m.DelCache(newBean); e != nil {
-			return e
-		}
-		if v, ok := newBean.(ItfSessionAfterUpdate); ok {
-			if e = v.SessionAfterUpdate(sn); e != nil {
-				return e
-			}
-		}
-		if queryAfter {
-			_, e = sn.NoAutoCondition().Where(queryList[0]).Get(newBean)
-			if e != nil {
-				return e
-			}
-		}
-		return e
+		newBean = v
+		return nil
 	})
 	return
 }
 
 //Delete ...
 func (m *Mysql) Delete(bean interface{}) (err error) {
-	queryList := new(cacheBind).Values(bean)
-	if len(queryList) == 0 {
-		return
-	}
-	if err = m.CacheGet(bean); err != nil {
-		return
-	}
-	return m.TXCallback(func(sn *xorm.Session) error {
-		var e error
-		if v, ok := bean.(ItfSessionBeforeDelete); ok {
-			if e = v.SessionBeforeDelete(sn); e != nil {
-				return e
-			}
-		}
-		if _, e = sn.NoAutoCondition().Where(queryList[0]).Delete(bean); e != nil {
-			return e
-		}
-		if e = m.DelCache(bean); e != nil {
-			return e
-		}
-		if v, ok := bean.(ItfSessionAfterDelete); ok {
-			if e = v.SessionAfterDelete(sn); e != nil {
-				return e
-			}
-		}
-		return e
-	})
+	return m.TXCallback(func(sn *xorm.Session) error { return m.Session(sn).Delete(bean) })
 }
+
+//Session ...
+func (m *Mysql) Session(sn *xorm.Session) *Session { return newSession(m, sn) }
 
 //DelCache ...
 func (m *Mysql) DelCache(bean interface{}, condition ...interface{}) (err error) {
@@ -543,7 +426,7 @@ func (c *CompoundIndex) makeQuery() string {
 //execCreate ...创建索引
 func (c *CompoundIndex) execCreate(table string) (err error) {
 	if c.sn == nil {
-		panic("orm session is nil!")
+		panic("orm Session is nil!")
 	}
 
 	cs1 := func() []string {
