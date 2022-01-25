@@ -111,7 +111,7 @@ func (r *redisObj) subAction(sub *redis.PubSub) {
 				_d1 := make(json.RawMessage, 0)
 				payloadData = &_d1
 			}
-			r.Go.Submit(func() (err error) { r.subHandlers[payload.Name](*payloadData); return })
+			r.Go.Go(func() (err error) { r.subHandlers[payload.Name](*payloadData); return })
 		}
 	}
 }
