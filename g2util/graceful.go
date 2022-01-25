@@ -78,14 +78,14 @@ func (g *Graceful) shutdownAction() {
 	for _, process := range slp {
 		//实现了io的对象,等到下一个释放
 		if _, ok := process.(io.Writer); !ok {
-			process.AfterShutdown()
+			TimeoutExecFunc(process.AfterShutdown, time.Second*30)
 			continue
 		}
 		slpIO = append(slpIO, process)
 	}
 
 	for _, process := range slpIO {
-		process.AfterShutdown()
+		TimeoutExecFunc(process.AfterShutdown, time.Second*30)
 	}
 	g.mu.Unlock()
 }

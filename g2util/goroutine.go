@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"runtime/debug"
 	"sync"
+	"time"
 
 	"github.com/henrylee2cn/goutil"
 	"github.com/panjf2000/ants/v2"
@@ -31,7 +32,10 @@ func (g *GoPool) Constructor() {
 }
 
 //AfterShutdown ...
-func (g *GoPool) AfterShutdown() { g.wait.Wait(); g.pool.Release() }
+func (g *GoPool) AfterShutdown() {
+	TimeoutExecFunc(g.wait.Wait, time.Second*30)
+	g.pool.Release()
+}
 
 //Pool ...
 func (g *GoPool) Pool() *ants.Pool { return g.pool }
@@ -49,7 +53,10 @@ func (g *GoPool) goFuncDo(fn goFunc) {
 //Submit ...
 func (g *GoPool) Submit(fn goFunc) {
 	g.wait.Add(1)
-	_ = g.pool.Submit(func() { defer g.wait.Done(); g.goFuncDo(fn) })
+	_ = g.pool.Submit(func() {
+		defer g.wait.Done()
+		g.goFuncDo(fn)
+	})
 }
 
 //Go ... 直接执行,不加入wait队列
