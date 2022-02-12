@@ -95,15 +95,30 @@ func (m *Mysql) Session(sn *xorm.Session) *Session { return newSession(m, sn) }
 
 //DelCache ...
 func (m *Mysql) DelCache(bean interface{}, condition ...interface{}) (err error) {
-	return m.Redis.PubDelCache(m.cacheMemKeys(bean, condition...))
+	return m.Redis.PubDelCache(m.CacheMemKeys(bean, condition...))
 }
 
-//cacheMemKeys ...
-func (m *Mysql) cacheMemKeys(bean interface{}, condition ...interface{}) (list []string) {
+//CacheMemKeys ...
+func (m *Mysql) CacheMemKeys(bean interface{}, condition ...interface{}) (list []string) {
 	queryList := new(cacheBind).Values(bean, condition...)
 	list = make([]string, 0)
 	for _, s := range queryList {
 		list = append(list, memKey(bean, s))
+	}
+	return
+}
+
+//CacheRestore ...
+func (m *Mysql) CacheRestore(bean interface{}) (err error) {
+	val, err := json.Marshal(bean)
+	if err != nil {
+		return
+	}
+	for _, k := range m.CacheMemKeys(bean) {
+		m.Cache.Atomic(k, func() { err = m.Cache.Cache.Set(k, val) })
+		if err != nil {
+			return
+		}
 	}
 	return
 }
