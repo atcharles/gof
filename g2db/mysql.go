@@ -394,6 +394,12 @@ func (m *Mysql) sync() (err error) {
 					return
 				}
 			}
+
+			if obj, ok := table.(ItfAfterSync); ok {
+				if e = obj.AfterSync(sn); e != nil {
+					return
+				}
+			}
 		}
 		return
 	})

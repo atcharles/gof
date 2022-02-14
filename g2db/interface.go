@@ -33,3 +33,8 @@ type ItfSessionAfterUpdate interface {
 type ItfSessionAfterDelete interface {
 	SessionAfterDelete(sn *xorm.Session) (err error)
 }
+
+//ItfAfterSync ...
+type ItfAfterSync interface {
+	AfterSync(sn *xorm.Session) error
+}
