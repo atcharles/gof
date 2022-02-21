@@ -18,3 +18,4 @@ func (i *Instance) Get(key string) ([]byte, error)    { return i.inc.Get(key) }
 func (i *Instance) Delete(key string) error           { return i.inc.Delete(key) }
 func (i *Instance) Reset() error                      { return i.inc.Reset() }
 func (i *Instance) CacheInstance() store.ItfCache     { return i.inc.CacheInstance() }
+func (i *Instance) SetInstance(inc store.ItfCache)    { i.inc = inc }
