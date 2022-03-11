@@ -240,7 +240,8 @@ func (s *server) handle(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return
 	}
 	for i, e2 := range elem {
-		elem[i] = s.formatName(CamelString(e2))
+		//elem[i] = s.formatName(CamelString(e2))
+		elem[i] = s.formatName(e2)
 	}
 	msg.Method = strings.Join(elem, splitMethodSeparator)
 
