@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"sync"
 
 	"github.com/henrylee2cn/goutil"
 	"github.com/spf13/cast"
@@ -16,6 +17,14 @@ type Config struct {
 	rootPath string
 	filename string
 	viper    *viper.Viper
+	mutex    sync.RWMutex
+}
+
+//LockFunc ...
+func (c *Config) LockFunc(fn func(v *viper.Viper) (e error)) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return fn(c.viper)
 }
 
 //AppName ...
