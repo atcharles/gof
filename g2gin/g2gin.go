@@ -85,12 +85,11 @@ func (g *G2gin) useJ2rpc(rg *gin.RouterGroup) {
 func (g *G2gin) copyRequestBody() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if gin.IsDebugging() {
-			var bodyBytes []byte
 			if c.Request.Body != nil {
-				bodyBytes, _ = io.ReadAll(c.Request.Body)
+				bodyBytes, _ := io.ReadAll(c.Request.Body)
+				c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+				c.Set("REQUEST_BODY", bodyBytes)
 			}
-			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-			c.Set("REQUEST_BODY", bodyBytes)
 		}
 		c.Next()
 	}
