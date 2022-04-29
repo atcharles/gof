@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE file.
 
 //go:build !jsoniter && !go_json
-// +build !jsoniter,!go_json
 
 package json
 
