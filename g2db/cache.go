@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/atcharles/gof/v2/g2cache/store"
 	"github.com/novalagung/gubrak/v2"
 	"github.com/unknwon/com"
+
+	"github.com/atcharles/gof/v2/g2cache/store"
 
 	"github.com/atcharles/gof/v2/g2util"
 )
@@ -43,6 +44,7 @@ func (c *cacheMem) RedisSubDelCache() RedisSubHandlerFunc {
 			if e := c.Cache.Delete(key); e != nil {
 				c.Logger.Errorf("删除缓存失败:%s; key:", e.Error(), key)
 			}
+			c.Delete(key)
 		}
 		return
 	}
@@ -65,6 +67,12 @@ func (c *cacheMem) Atomic(key string, fn func()) {
 	mu.Lock()
 	fn()
 	mu.Unlock()
+}
+
+//Delete ...
+func (c *cacheMem) Delete(key string) {
+	c.Atomic(key, func() { _ = c.Cache.Delete(key) })
+	return
 }
 
 //GetOrStore ...
