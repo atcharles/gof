@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/allegro/bigcache/v3 v3.0.2
 	github.com/davecgh/go-spew v1.1.1
-	github.com/dgraph-io/ristretto v0.1.0
+	github.com/dgraph-io/ristretto v0.1.1-0.20220818201730-4093c561df10
 	github.com/didip/tollbooth/v6 v6.1.2
 	github.com/eclipse/paho.mqtt.golang v1.4.1
 	github.com/facebookgo/inject v0.0.0-20180706035515-f23751cae28b
@@ -77,6 +77,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
+	go.uber.org/atomic v1.10.0 // indirect
 	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8 // indirect
 	golang.org/x/image v0.0.0-20220722155232-062f8c9fd539 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect

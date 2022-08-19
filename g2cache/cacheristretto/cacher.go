@@ -35,10 +35,12 @@ func (r *Ristretto) Constructor() {
 }
 
 func (r *Ristretto) String() string { return "ristretto" }
+
 func (r *Ristretto) Set(key string, data []byte) (err error) {
-	r.inc.SetWithTTL(key, data, 1, 0)
+	r.inc.SetWithTTL(key, data, int64(len(data)), 0)
 	return
 }
+
 func (r *Ristretto) Get(key string) (data []byte, err error) {
 	val, has := r.inc.Get(key)
 	if !has {
@@ -57,7 +59,9 @@ func (r *Ristretto) Get(key string) (data []byte, err error) {
 }
 
 func (r *Ristretto) Delete(key string) (err error) { r.inc.Del(key); return }
-func (r *Ristretto) Reset() (err error)            { r.inc.Clear(); return }
+
+func (r *Ristretto) Reset() (err error) { r.inc.Clear(); return }
+
 func (r *Ristretto) CacheInstance() store.ItfCache { return r }
 
 func init() {
