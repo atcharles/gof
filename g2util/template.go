@@ -5,7 +5,7 @@ import (
 	"text/template"
 )
 
-//TextTemplateMustParse ...
+// TextTemplateMustParse ...
 func TextTemplateMustParse(text string, data interface{}) (result string) {
 	tp, err := template.New("t").Parse(text)
 	if err != nil {

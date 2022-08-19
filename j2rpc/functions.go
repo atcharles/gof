@@ -83,7 +83,7 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 	_, _ = fmt.Fprint(w, msg)
 }
 
-//AbortWriteHeader ...
+// AbortWriteHeader ...
 func AbortWriteHeader(w http.ResponseWriter, code int) {
 	w.WriteHeader(code)
 	w.Header().Set("Status-Written", "1")

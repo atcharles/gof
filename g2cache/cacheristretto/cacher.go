@@ -3,18 +3,19 @@ package cacheristretto
 import (
 	"encoding/json"
 
-	"github.com/atcharles/gof/v2/g2cache/store"
 	"github.com/dgraph-io/ristretto"
+
+	"github.com/atcharles/gof/v2/g2cache/store"
 )
 
-//Ristretto ...
+// Ristretto ...
 type Ristretto struct {
 	inc *ristretto.Cache
 }
 
 func (r *Ristretto) Instance() *ristretto.Cache { return r.inc }
 
-//New ...
+// New ...
 func (*Ristretto) New() *Ristretto {
 	inc := new(Ristretto)
 	inc.Constructor()

@@ -9,15 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/atcharles/gof/v2/g2util"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pkg/errors"
+
+	"github.com/atcharles/gof/v2/g2util"
 )
 
-//EmqInstance ..
+// EmqInstance ..
 var EmqInstance *Emq
 
-//Emq ...
+// Emq ...
 type Emq struct {
 	Config *g2util.Config `inject:""`
 
@@ -29,7 +30,7 @@ type Emq struct {
 	topicPrefix string
 }
 
-//prepareOption ...
+// prepareOption ...
 func (e *Emq) prepareOption() {
 	//mqtt.DEBUG = NewLevelLogger("[mqtt]")
 	//mqtt.WARN = NewLevelLogger("[mqtt]")
@@ -52,17 +53,17 @@ func (e *Emq) prepareOption() {
 	e.opt = o1
 }
 
-//EmqSuperAuth ...
+// EmqSuperAuth ...
 func (e *Emq) EmqSuperAuth() (username, password string) {
 	cfg := e.Config.Viper()
 	sha256P := sha256.Sum256([]byte(cfg.GetString("emqx.super_password")))
 	return cfg.GetString("emqx.super_username"), hex.EncodeToString(sha256P[:])
 }
 
-//Client ...
+// Client ...
 func (e *Emq) Client() mqtt.Client { return e.client }
 
-//Constructor ...
+// Constructor ...
 func (e *Emq) Constructor() {
 	e.qos = 1
 	e.retained = false
@@ -70,7 +71,7 @@ func (e *Emq) Constructor() {
 	EmqInstance = e
 }
 
-//Publish ...
+// Publish ...
 func (e *Emq) Publish(topic string, payload interface{}) (err error) {
 	var buf bytes.Buffer
 	switch v := payload.(type) {
@@ -89,7 +90,7 @@ func (e *Emq) Publish(topic string, payload interface{}) (err error) {
 	return t.Error()
 }
 
-//Subscribe ...
+// Subscribe ...
 func (e *Emq) Subscribe(topic string, callback mqtt.MessageHandler) (err error) {
 	topic = e.topicPrefix + topic
 	t := e.client.Subscribe(topic, e.qos, callback)
@@ -99,14 +100,14 @@ func (e *Emq) Subscribe(topic string, callback mqtt.MessageHandler) (err error) 
 	return t.Error()
 }
 
-//Dial ...
+// Dial ...
 func (e *Emq) Dial() {
 	if err := e.dial(); err != nil {
 		log.Fatalln(err)
 	}
 }
 
-//dial ...
+// dial ...
 func (e *Emq) dial() (err error) {
 	e.prepareOption()
 	e.client = mqtt.NewClient(e.opt)

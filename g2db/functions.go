@@ -15,7 +15,7 @@ var (
 	_ = dump.P
 )
 
-//initializeTables 初始化数据表
+// initializeTables 初始化数据表
 func initializeTables(table ItfInitData, sn *xorm.Session) (err error) {
 	tbName := tableName(table)
 	beans := table.InitData()
@@ -44,7 +44,7 @@ func initializeTables(table ItfInitData, sn *xorm.Session) (err error) {
 	return
 }
 
-//HasError ...
+// HasError ...
 func HasError(e error) (bool, error) {
 	if e == nil {
 		return true, e

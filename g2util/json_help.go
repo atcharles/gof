@@ -8,7 +8,7 @@ import (
 	"github.com/atcharles/gof/v2/json"
 )
 
-//JSONDump ...
+// JSONDump ...
 func JSONDump(val interface{}, args ...interface{}) string {
 	var indent bool
 	if len(args) > 0 {
@@ -20,16 +20,16 @@ func JSONDump(val interface{}, args ...interface{}) string {
 	return goutil.BytesToString(JsMarshal(val))
 }
 
-//JsMarshal ...
+// JsMarshal ...
 func JsMarshal(val interface{}) (bts []byte) { bts, _ = json.Marshal(val); return }
 
-//JsMarshalIndent ...
+// JsMarshalIndent ...
 func JsMarshalIndent(val interface{}) (bts []byte) {
 	bts, _ = json.MarshalIndent(val, "", "\t")
 	return
 }
 
-//JSONUnmarshalFromBase64 ...
+// JSONUnmarshalFromBase64 ...
 func JSONUnmarshalFromBase64(data []byte, val interface{}) error {
 	enc := base64.StdEncoding
 	dbuf := make([]byte, enc.DecodedLen(len(data)))
@@ -41,7 +41,7 @@ func JSONUnmarshalFromBase64(data []byte, val interface{}) error {
 	return json.Unmarshal(bts, val)
 }
 
-//JSONMarshalToBase64 ...
+// JSONMarshalToBase64 ...
 func JSONMarshalToBase64(val interface{}) ([]byte, error) {
 	bts, err := json.Marshal(val)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/atcharles/gof/v2/g2cache/store"
 )
 
-//Instance ...
+// Instance ...
 type Instance struct{ inc store.ItfCache }
 
 func (i *Instance) Constructor()                      { i.inc, _ = store.GetStore() }

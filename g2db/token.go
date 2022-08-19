@@ -8,16 +8,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/atcharles/gof/v2/g2util"
-	"github.com/atcharles/gof/v2/j2rpc"
-	"github.com/atcharles/gof/v2/json"
 	"github.com/go-redis/redis/v8"
 	"github.com/henrylee2cn/goutil"
 	"github.com/spf13/cast"
 	"github.com/unknwon/com"
+
+	"github.com/atcharles/gof/v2/g2util"
+	"github.com/atcharles/gof/v2/j2rpc"
+	"github.com/atcharles/gof/v2/json"
 )
 
-//constants
+// constants
 const (
 	SYSKey = "P6UEgd7ln9mpMz5hGWYqT21cSHOtkJQZ"
 
@@ -26,7 +27,7 @@ const (
 	GinContextJWTUIDKey = "JWT_UID"
 )
 
-//ItfGinContext ...
+// ItfGinContext ...
 type ItfGinContext interface {
 	context.Context
 	Set(key string, value interface{})
@@ -34,7 +35,7 @@ type ItfGinContext interface {
 	Query(key string) string
 }
 
-//Token ...
+// Token ...
 type Token struct {
 	Config *g2util.Config `inject:""`
 
@@ -46,7 +47,7 @@ type Token struct {
 
 const defaultTokenTimeout = time.Hour * 24 * 10
 
-//NewCopy ...
+// NewCopy ...
 func (t *Token) NewCopy(key string) *Token {
 	return &Token{
 		Config: t.Config,
@@ -62,7 +63,7 @@ func (t *Token) NewCopy(key string) *Token {
 	}
 }
 
-//Constructor ...
+// Constructor ...
 func (t *Token) Constructor() {
 	t.option = &TokenOption{
 		CacheKey:   "h:token",
@@ -73,20 +74,20 @@ func (t *Token) Constructor() {
 	}
 }
 
-//AfterLogin ...
+// AfterLogin ...
 func (t *Token) AfterLogin(ctx context.Context, id int64) (td *TokenData, err error) {
 	return t.write2redis(ctx, id)
 }
 
-//Verify ...
+// Verify ...
 func (t *Token) Verify(ctx ItfGinContext, fns ...func() error) (err error) {
 	return t.verify(ctx, fns...)
 }
 
-//Logout ...
+// Logout ...
 func (t *Token) Logout(ctx context.Context, id int64) (err error) { return t.removeTokenData(ctx, id) }
 
-//Option ...
+// Option ...
 func (t *Token) Option() *TokenOption { return t.option }
 
 func (t *Token) redisCacheKey() string {
@@ -97,13 +98,13 @@ func (t *Token) redisCacheKey() string {
 	return fmt.Sprintf("%s:%s", name, t.option.CacheKey)
 }
 
-//redisField ...
+// redisField ...
 func (t *Token) redisField(id int64) string { return cast.ToString(id) }
 
-//memCacheKey ...
+// memCacheKey ...
 func (t *Token) memCacheKey(id int64) string { return fmt.Sprintf("%s::%d", t.redisCacheKey(), id) }
 
-//write2redis ...
+// write2redis ...
 func (t *Token) write2redis(ctx context.Context, id int64) (td *TokenData, err error) {
 	if t.option.MultiLogin(id) {
 		var ts1 string
@@ -118,7 +119,7 @@ func (t *Token) write2redis(ctx context.Context, id int64) (td *TokenData, err e
 	return
 }
 
-//verify ...
+// verify ...
 func (t *Token) verify(ctx ItfGinContext, fns ...func() error) (err error) {
 	token := ctx.GetHeader("token")
 	if len(token) == 0 {
@@ -205,7 +206,7 @@ func (t *Token) cacheVerify(ctx ItfGinContext, id int64, token string) (tt *Toke
 	return
 }
 
-//removeTokenData ...
+// removeTokenData ...
 func (t *Token) removeTokenData(ctx context.Context, id int64) (err error) {
 	if err = t.Redis.Client().HDel(ctx, t.redisCacheKey(), t.redisField(id)).Err(); err != nil {
 		return
@@ -216,7 +217,7 @@ func (t *Token) removeTokenData(ctx context.Context, id int64) (err error) {
 	return
 }
 
-//TokenOption ...
+// TokenOption ...
 type TokenOption struct {
 	CacheKey string
 	//有效期时间
@@ -229,13 +230,13 @@ type TokenOption struct {
 	MultiLogin func(id int64) bool
 }
 
-//expireTimeAddr ...
+// expireTimeAddr ...
 func (t *TokenOption) expireTimeAddr() *time.Time {
 	to1 := g2util.TimeNow().Add(t.Timeout)
 	return &to1
 }
 
-//generateTd ...
+// generateTd ...
 func (t *TokenOption) generateTd(id int64) (td *TokenData) {
 	td = &TokenData{ID: id}
 	id1 := goutil.StringToBytes(cast.ToString(id))
@@ -244,7 +245,7 @@ func (t *TokenOption) generateTd(id int64) (td *TokenData) {
 	return
 }
 
-//getIDByToken ...
+// getIDByToken ...
 func (t *TokenOption) getIDByToken(token string) (id int64, err error) {
 	id1, err := goutil.AESCBCDecrypt(t.EncryptKey, bytes.ToLower([]byte(token)))
 	if err != nil {
@@ -260,7 +261,7 @@ func unmarshalTokenData(s string) (tt *TokenData, err error) {
 	return
 }
 
-//TokenData ...
+// TokenData ...
 type TokenData struct {
 	ID     int64      `json:"id,omitempty"`
 	Token  string     `json:"token,omitempty"`
@@ -269,7 +270,7 @@ type TokenData struct {
 
 func (t *TokenData) String() string { return g2util.JSONDump(t) }
 
-//write2redis ...
+// write2redis ...
 func (t *TokenData) write2redis(ctx context.Context, tk *Token) (err error) {
 	kv := map[string]interface{}{cast.ToString(t.ID): t.String()}
 	err = tk.Redis.Client().HSet(ctx, tk.redisCacheKey(), kv).Err()

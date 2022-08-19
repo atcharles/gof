@@ -1,23 +1,24 @@
 package g2db
 
 import (
-	"github.com/atcharles/gof/v2/g2util"
 	"github.com/pkg/errors"
 	"xorm.io/xorm"
+
+	"github.com/atcharles/gof/v2/g2util"
 )
 
-//newSession ...
+// newSession ...
 func newSession(mysql *Mysql, sn *xorm.Session) *Session {
 	return &Session{mysql: mysql, sn: sn}
 }
 
-//Session ...
+// Session ...
 type Session struct {
 	mysql *Mysql
 	sn    *xorm.Session
 }
 
-//Delete ...
+// Delete ...
 func (s *Session) Delete(bean interface{}) (err error) {
 	queryList := new(cacheBind).Values(bean)
 	if len(queryList) == 0 {
@@ -45,7 +46,7 @@ func (s *Session) Delete(bean interface{}) (err error) {
 	return
 }
 
-//Insert ...
+// Insert ...
 func (s *Session) Insert(bean interface{}) (err error) {
 	if v1, ok := bean.(ItfSessionBeforeInsert); ok {
 		if err = v1.SessionBeforeInsert(s.sn); err != nil {
@@ -70,7 +71,7 @@ func (s *Session) Insert(bean interface{}) (err error) {
 	return
 }
 
-//Update ...
+// Update ...
 func (s *Session) Update(bean interface{}, params ...interface{}) (newBean interface{}, err error) {
 	newBean, err = g2util.CopyBean(bean)
 	if err != nil {

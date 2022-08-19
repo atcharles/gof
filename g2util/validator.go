@@ -11,10 +11,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-//Valid ...
+// Valid ...
 var Valid = new(Validator).New()
 
-//Validator ...
+// Validator ...
 type Validator struct {
 	valid *validator.Validate
 	trans ut.Translator
@@ -24,7 +24,7 @@ type listError []string
 
 func (l listError) Error() string { return strings.Join(l, ",") }
 
-//TranslateZh ...
+// TranslateZh ...
 func (v *Validator) TranslateZh(es error) (err error) {
 	if es == nil {
 		return
@@ -45,20 +45,20 @@ func (v *Validator) TranslateZh(es error) (err error) {
 	return
 }
 
-//ValidAndTranslateZh ...
+// ValidAndTranslateZh ...
 func (v *Validator) ValidAndTranslateZh(s interface{}) (err error) {
 	return v.TranslateZh(v.valid.Struct(s))
 }
 
-//ValidVarWithTransZh ...
+// ValidVarWithTransZh ...
 func (v *Validator) ValidVarWithTransZh(val interface{}, tag string) (err error) {
 	return v.TranslateZh(v.valid.Var(val, tag))
 }
 
-//Valid ...
+// Valid ...
 func (v *Validator) Valid() *validator.Validate { return v.valid }
 
-//Constructor ...
+// Constructor ...
 func (v *Validator) Constructor() {
 	err := v.initialize()
 	if err != nil {
@@ -66,10 +66,10 @@ func (v *Validator) Constructor() {
 	}
 }
 
-//New ...
+// New ...
 func (v *Validator) New() *Validator { v.Constructor(); return v }
 
-//initialize ...
+// initialize ...
 func (v *Validator) initialize() (err error) {
 	//中文翻译器
 	zh1 := lzh.New()
@@ -96,14 +96,14 @@ func (v *Validator) initialize() (err error) {
 	return
 }
 
-//regTranslationMobile ...
+// regTranslationMobile ...
 func (v *Validator) regTranslationMobile() (err error) {
 	return v.validatorRegValidation("mobile", "{0}手机号码错误", func(fl validator.FieldLevel) bool {
 		return regexp.MustCompile(`^1[3456789]\d{9}$`).MatchString(fl.Field().String())
 	})
 }
 
-//regTranslationUsername ...
+// regTranslationUsername ...
 func (v *Validator) regTranslationUsername() (err error) {
 	return v.validatorRegValidation("username", "{0}(用户账号为数字或字母组合;并且长度为[5-15])",
 		func(fl validator.FieldLevel) bool {
@@ -112,7 +112,7 @@ func (v *Validator) regTranslationUsername() (err error) {
 	)
 }
 
-//regPassword ...
+// regPassword ...
 func (v *Validator) regPassword() (err error) {
 	_fn1 := func(str string) bool {
 		if !regexp.MustCompile(`^\S{8,24}$`).MatchString(str) {

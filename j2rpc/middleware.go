@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-//middleInfo ...中间件信息
+// middleInfo ...中间件信息
 type middleInfo struct {
 	//作用于方法名, 支持正则表达式
 	method []string
@@ -17,7 +17,7 @@ type middleInfo struct {
 	all bool
 }
 
-//getMatchFunction ...
+// getMatchFunction ...
 func (m *middleInfo) getMatchFunction(method string) interface{} {
 	if m.all {
 		return m.function

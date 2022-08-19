@@ -20,13 +20,13 @@ const (
 	_ = SetTimeZone()
 }*/
 
-//TimeNowFunc ...
+// TimeNowFunc ...
 var TimeNowFunc = time.Now
 
-//TimeNow ...
+// TimeNow ...
 func TimeNow() time.Time { return TimeNowFunc() }
 
-//SetTimeZone ...Shanghai
+// SetTimeZone ...Shanghai
 func SetTimeZone() error {
 	lc, err := time.LoadLocation(TimeZone)
 	if err == nil {
@@ -35,25 +35,25 @@ func SetTimeZone() error {
 	return err
 }
 
-//JSONTime ...
+// JSONTime ...
 type JSONTime time.Time
 
-//Today ...今日日期
+// Today ...今日日期
 func Today() *JSONTime { return JSONTime(TimeNow()).Addr().Date() }
 
-//Now 当前时间
+// Now 当前时间
 func Now() *JSONTime { return NewJSONTimeOfTime(TimeNow()) }
 
-//NewJSONTimeOfTime 时间转换为JSONTime
+// NewJSONTimeOfTime 时间转换为JSONTime
 func NewJSONTimeOfTime(t time.Time) *JSONTime { return JSONTime(t).Addr() }
 
-//ToDatetime ...
+// ToDatetime ...
 func ToDatetime(in string) (JSONTime, error) {
 	out, err := time.ParseInLocation(Custom, in, time.Local)
 	return JSONTime(out), err
 }
 
-//Must2JSONTimeAddr maybe panic
+// Must2JSONTimeAddr maybe panic
 func Must2JSONTimeAddr(in string) *JSONTime {
 	j, err := ToDatetime(in)
 	if err != nil {
@@ -75,17 +75,17 @@ func (p *JSONTime) ToDB() (b []byte, err error) {
 	return
 }*/
 
-//SetByTime ...
+// SetByTime ...
 func (p *JSONTime) SetByTime(timeVal time.Time) {
 	*p = JSONTime(timeVal)
 }
 
-//Time ...
+// Time ...
 func (p *JSONTime) Time() time.Time {
 	return p.Convert2Time()
 }
 
-//Date ...返回一个日期0点的时间
+// Date ...返回一个日期0点的时间
 func (p *JSONTime) Date() *JSONTime {
 	y, m, d := p.Time().Date()
 	dt := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
@@ -93,7 +93,7 @@ func (p *JSONTime) Date() *JSONTime {
 	return &t
 }
 
-//Convert2Time ...
+// Convert2Time ...
 func (p *JSONTime) Convert2Time() time.Time {
 	return time.Time(*p).Local()
 }
@@ -134,7 +134,7 @@ func (p *JSONTime) GobDecode(data []byte) error {
 	return nil
 }
 
-//MarshalJSON ...
+// MarshalJSON ...
 func (p *JSONTime) MarshalJSON() ([]byte, error) {
 	if time.Time(*p).IsZero() {
 		return []byte(`""`), nil
@@ -146,7 +146,7 @@ func (p *JSONTime) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-//UnmarshalJSON ...
+// UnmarshalJSON ...
 func (p *JSONTime) UnmarshalJSON(data []byte) error {
 	local, err := time.ParseInLocation(`"`+Custom+`"`, string(data), time.Local)
 	if err != nil {
@@ -156,29 +156,29 @@ func (p *JSONTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//String ...
+// String ...
 func (p *JSONTime) String() string { return p.Convert2Time().Format(Custom) }
 
-//StringFormat 转换为固定格式字符串
+// StringFormat 转换为固定格式字符串
 func (p *JSONTime) StringFormat(layout string) string { return p.Convert2Time().Format(layout) }
 
-//Addr ...
+// Addr ...
 func (p JSONTime) Addr() *JSONTime { return &p }
 
-//Add ...
+// Add ...
 func (p *JSONTime) Add(d time.Duration) *JSONTime { return NewJSONTimeOfTime(p.Time().Add(d)) }
 
-//TimeExcWrap 包装执行时间
+// TimeExcWrap 包装执行时间
 func TimeExcWrap(fn func()) time.Duration {
 	n := TimeNow()
 	fn()
 	return time.Since(n)
 }
 
-//TodayDate ...
+// TodayDate ...
 func TodayDate() string { return TimeNow().Format(DateLayout) }
 
-//RetryDoTimes ...
+// RetryDoTimes ...
 func RetryDoTimes(times, intervalSecond int64, fn func() error) error {
 	var a int64
 	var err error
@@ -193,7 +193,7 @@ func RetryDoTimes(times, intervalSecond int64, fn func() error) error {
 	return err
 }
 
-//RetryDo 重试行为
+// RetryDo 重试行为
 func RetryDo(fn func() error, intervalSecond int64) error {
 	var (
 		err error

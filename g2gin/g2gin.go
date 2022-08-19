@@ -17,7 +17,7 @@ import (
 	"github.com/atcharles/gof/v2/j2rpc"
 )
 
-//G2gin ...
+// G2gin ...
 type G2gin struct {
 	Config   *g2util.Config   `inject:""`
 	AbFile   *g2util.AbFile   `inject:""`
@@ -28,13 +28,13 @@ type G2gin struct {
 	j2Service interface{}
 }
 
-//Constructor ...
+// Constructor ...
 func (g *G2gin) Constructor() { g.j2opt = j2rpc.SnakeOption }
 
-//SetJ2Service ...
+// SetJ2Service ...
 func (g *G2gin) SetJ2Service(j2Service interface{}) { g.j2Service = j2Service }
 
-//Run ...
+// Run ...
 func (g *G2gin) Run() {
 	v := g.Config.Viper().GetStringMap("http_server")
 	gin.SetMode(cast.ToString(v["mode"]))
@@ -64,7 +64,7 @@ func (g *G2gin) Run() {
 	g.profServer()
 }
 
-//useJ2rpc ...
+// useJ2rpc ...
 func (g *G2gin) useJ2rpc(rg *gin.RouterGroup) {
 	jsv := j2rpc.New(g.j2opt)
 	jsv.Logger().SetLevel(g2util.ParseLevel(g.Config.Viper().GetString("global.log_level")))
@@ -81,7 +81,7 @@ func (g *G2gin) useJ2rpc(rg *gin.RouterGroup) {
 	rg.Any("/jsonrpc", func(c *gin.Context) { jsv.Handler(c, c.Writer, c.Request) })
 }
 
-//copyRequestBody ...
+// copyRequestBody ...
 func (g *G2gin) copyRequestBody() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if gin.IsDebugging() {
@@ -95,7 +95,7 @@ func (g *G2gin) copyRequestBody() gin.HandlerFunc {
 	}
 }
 
-//UseLogger ...
+// UseLogger ...
 func (g *G2gin) UseLogger(rg *gin.RouterGroup, writer io.Writer, skipPaths []string) {
 	webIO := gin.DefaultWriter
 	if writer != nil {
@@ -142,7 +142,7 @@ func (g *G2gin) UseLogger(rg *gin.RouterGroup, writer io.Writer, skipPaths []str
 	}))
 }
 
-//useCors ...
+// useCors ...
 func (g *G2gin) useCors(rg *gin.RouterGroup) {
 	_config := cors.Config{
 		//AllowAllOrigins: true,
@@ -166,7 +166,7 @@ func (g *G2gin) useCors(rg *gin.RouterGroup) {
 	rg.Use(cors.New(_config))
 }
 
-//profServer ...
+// profServer ...
 func (g *G2gin) profServer() {
 	//go get -u github.com/google/pprof
 	//需要安装 graphviz

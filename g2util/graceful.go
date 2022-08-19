@@ -30,20 +30,20 @@ type (
 	}
 )
 
-//Constructor ...
+// Constructor ...
 func (g *Graceful) Constructor() {
 	g.sig = make(chan os.Signal)
 	g.processList = make([]ItfGracefulProcess, 0)
 	g.srvList = make([]*http.Server, 0)
 }
 
-//WaitForSignal ...
+// WaitForSignal ...
 func (g *Graceful) WaitForSignal() {
 	signal.Notify(g.sig)
 	g.StartSignal()
 }
 
-//RegProcessor ...注册一个对象,用于关闭程序后的行为
+// RegProcessor ...注册一个对象,用于关闭程序后的行为
 func (g *Graceful) RegProcessor(p ItfGracefulProcess) { g.regProcessor(p) }
 func (g *Graceful) regProcessor(p ItfGracefulProcess) {
 	g.mu.Lock()
@@ -51,7 +51,7 @@ func (g *Graceful) regProcessor(p ItfGracefulProcess) {
 	g.mu.Unlock()
 }
 
-//RegHTTPServer ...注册一个http服务
+// RegHTTPServer ...注册一个http服务
 func (g *Graceful) RegHTTPServer(srv *http.Server) { g.regHTTPServer(srv) }
 func (g *Graceful) regHTTPServer(srv *http.Server) {
 	g.mu.Lock()
@@ -66,7 +66,7 @@ func (g *Graceful) regHTTPServer(srv *http.Server) {
 	g.mu.Unlock()
 }
 
-//shutdownAction ...
+// shutdownAction ...
 func (g *Graceful) shutdownAction() {
 	g.mu.Lock()
 	for _, srv := range g.srvList {
@@ -90,7 +90,7 @@ func (g *Graceful) shutdownAction() {
 	g.mu.Unlock()
 }
 
-//StartSignal ...监听信号
+// StartSignal ...监听信号
 func (g *Graceful) StartSignal() {
 	defer func() {
 		signal.Stop(g.sig)
@@ -111,7 +111,7 @@ func (g *Graceful) StartSignal() {
 	}
 }
 
-//graceShutdownHTTPServer ...http 服务优雅关闭
+// graceShutdownHTTPServer ...http 服务优雅关闭
 func (g *Graceful) graceShutdownHTTPServer(srv *http.Server) {
 	f1 := fmt.Sprintf("[Server listening on->%s]", srv.Addr)
 	//Base.StdLogger.Infof("Shutdown %s ...", f1)

@@ -8,7 +8,7 @@ import (
 )
 
 // RPCMessage A value of this type can a JSON-RPC request, notification, successful response or
-//error response. Which one it is depends on the fields.
+// error response. Which one it is depends on the fields.
 type RPCMessage struct {
 	ID      json.RawMessage `json:"id,omitempty"`
 	Version string          `json:"jsonrpc,omitempty"`
@@ -18,7 +18,7 @@ type RPCMessage struct {
 	Error   *Error          `json:"error,omitempty"`
 }
 
-//writeResponse ...
+// writeResponse ...
 func (r *RPCMessage) writeResponse(w http.ResponseWriter) {
 	if len(w.Header().Get("Status-Written")) != 0 {
 		return
@@ -35,7 +35,7 @@ func (r *RPCMessage) writeResponse(w http.ResponseWriter) {
 	_, _ = n, err
 }
 
-//output ...
+// output ...
 func (r *RPCMessage) output() *RPCMessage {
 	if len(r.ID) == 0 {
 		r.ID = []byte{'1'}
@@ -46,7 +46,7 @@ func (r *RPCMessage) output() *RPCMessage {
 	return r
 }
 
-//setError ...
+// setError ...
 func (r *RPCMessage) setError(err error) *RPCMessage {
 	if err == nil {
 		return r
@@ -66,7 +66,7 @@ func (r *RPCMessage) setError(err error) *RPCMessage {
 	return r
 }
 
-//namespace ...returns the service's name
+// namespace ...returns the service's name
 func (r *RPCMessage) methods() ([]string, error) {
 	elem := strings.SplitN(r.Method, splitMethodSeparator, 2)
 	if len(elem) != 2 {

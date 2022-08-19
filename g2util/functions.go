@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-//TimeoutExecFunc ...
+// TimeoutExecFunc ...
 func TimeoutExecFunc(fn func(), timeout time.Duration) {
 	ch1 := make(chan struct{}, 1)
 	go func() {

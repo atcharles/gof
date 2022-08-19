@@ -4,18 +4,19 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/atcharles/gof/v2/g2cache/store"
 	"github.com/patrickmn/go-cache"
+
+	"github.com/atcharles/gof/v2/g2cache/store"
 )
 
-//GoCache ...
+// GoCache ...
 type GoCache struct {
 	inc *cache.Cache
 }
 
 func (g *GoCache) Instance() *cache.Cache { return g.inc }
 
-//New ...
+// New ...
 func (*GoCache) New() *GoCache {
 	inc := new(GoCache)
 	inc.Constructor()

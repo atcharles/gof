@@ -30,7 +30,7 @@ type (
 	}
 )
 
-//PopulateConstructor ...
+// PopulateConstructor ...
 func PopulateConstructor(value interface{}) {
 	vp := reflect.ValueOf(value)
 	if vp.Kind() != reflect.Ptr {

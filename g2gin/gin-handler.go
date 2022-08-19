@@ -8,14 +8,14 @@ import (
 	"github.com/spf13/cast"
 )
 
-//JSONResponse ...
+// JSONResponse ...
 type JSONResponse struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg,omitempty"`
 	Data interface{} `json:"data,omitempty"`
 }
 
-//JSONP ...
+// JSONP ...
 func JSONP(c *gin.Context, code int, val ...interface{}) {
 	var msg string
 	var data interface{}
@@ -37,7 +37,7 @@ var (
 	errorType      = reflect.TypeOf((*error)(nil)).Elem()
 )
 
-//GinHandler ...
+// GinHandler ...
 func GinHandler(fn interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		val, err := parseArgumentFromContext(fn, c)

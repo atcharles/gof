@@ -4,24 +4,25 @@ import (
 	"time"
 
 	"github.com/allegro/bigcache/v3"
+
 	"github.com/atcharles/gof/v2/g2cache/store"
 )
 
-//BigCache ...
+// BigCache ...
 type BigCache struct {
 	inc *bigcache.BigCache
 }
 
 func (b *BigCache) Instance() *bigcache.BigCache { return b.inc }
 
-//New ...
+// New ...
 func (*BigCache) New() *BigCache {
 	inc := new(BigCache)
 	inc.Constructor()
 	return inc
 }
 
-//Constructor ...
+// Constructor ...
 func (b *BigCache) Constructor() {
 	var err error
 	cfg := bigcache.DefaultConfig(time.Minute * 10)

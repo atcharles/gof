@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-//FuncName ...
+// FuncName ...
 func FuncName(fn interface{}) string {
 	name := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 	sl := strings.Split(name, ".")

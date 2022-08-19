@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-//ItfCache ...
+// ItfCache ...
 type ItfCache interface {
 	String() string
 	Set(key string, data []byte) (err error)
@@ -18,7 +18,7 @@ type ItfCache interface {
 
 var ins = make(map[string]ItfCache)
 
-//Register ...
+// Register ...
 func Register(s ItfCache) {
 	name := s.String()
 	if _, ok := ins[name]; ok {
@@ -40,5 +40,5 @@ func GetStore(names ...string) (ItfCache, error) {
 	return s, nil
 }
 
-//ErrNotFound ...
+// ErrNotFound ...
 var ErrNotFound = errors.New("item not found")

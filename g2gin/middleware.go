@@ -1,12 +1,13 @@
 package g2gin
 
 import (
-	"github.com/atcharles/gof/v2/g2util"
 	"github.com/didip/tollbooth/v6"
 	"github.com/gin-gonic/gin"
+
+	"github.com/atcharles/gof/v2/g2util"
 )
 
-//MiddlewareLimiter ...
+// MiddlewareLimiter ...
 var MiddlewareLimiter = func(conf *g2util.Config) gin.HandlerFunc {
 	requestsPerSecond := conf.Viper().GetFloat64("http_server.limit")
 	if requestsPerSecond < 1 {

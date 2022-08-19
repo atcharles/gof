@@ -19,7 +19,7 @@ import (
 //自动对大文件进行打包
 //自动删除n天前的文件
 
-//常量,大小定义
+// 常量,大小定义
 const (
 	_ int = 1 << (10 * iota)
 	//ignore KB
@@ -27,7 +27,7 @@ const (
 	MB
 )
 
-//IWriter ...
+// IWriter ...
 type IWriter interface {
 	AfterShutdown()
 	Closed() bool
@@ -37,7 +37,7 @@ type IWriter interface {
 	File() *os.File
 }
 
-//AbFile ...
+// AbFile ...
 type AbFile struct {
 	Config   *Config   `inject:""`
 	Graceful *Graceful `inject:""`
@@ -47,12 +47,12 @@ type AbFile struct {
 	files map[string]*innerIO
 }
 
-//MustLogIO ...
+// MustLogIO ...
 func (a *AbFile) MustLogIO(name string) IWriter {
 	return a.MustNewIO(filepath.Join(a.Config.RootPath(), "logs", name+".log"))
 }
 
-//MustNewIO ...获取一个io对象,一旦出错,将会panic
+// MustNewIO ...获取一个io对象,一旦出错,将会panic
 func (a *AbFile) MustNewIO(filePath string, opts ...*ABFileOption) IWriter {
 	o, err := a.newIO(filePath, opts...)
 	if err != nil {
@@ -63,12 +63,12 @@ func (a *AbFile) MustNewIO(filePath string, opts ...*ABFileOption) IWriter {
 	return o
 }
 
-//Constructor ...
+// Constructor ...
 func (a *AbFile) Constructor() { a.constructor() }
 
 func (a *AbFile) constructor() *AbFile { a.files = make(map[string]*innerIO); return a }
 
-//newIO ...
+// newIO ...
 func (a *AbFile) newIO(filePath string, opts ...*ABFileOption) (out *innerIO, err error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -129,7 +129,7 @@ type (
 	}
 )
 
-//File ...
+// File ...
 func (i *innerIO) File() *os.File {
 	i.RLock()
 	defer i.RUnlock()
@@ -142,14 +142,14 @@ func (i *innerIO) AfterShutdown() {
 	i.Close()
 }
 
-//Closed 是否关闭
+// Closed 是否关闭
 func (i *innerIO) Closed() bool {
 	i.RLock()
 	defer i.RUnlock()
 	return i.closed
 }
 
-//Close 关闭io
+// Close 关闭io
 func (i *innerIO) Close() {
 	if i.Closed() {
 		return
@@ -160,7 +160,7 @@ func (i *innerIO) Close() {
 	i.Unlock()
 }
 
-//run ...
+// run ...
 func (i *innerIO) run() {
 	tk := time.NewTicker(i.opt.AutoFlushPeriod)
 	tk2 := time.NewTicker(i.opt.AutoDelPeriod)
@@ -185,7 +185,7 @@ func (i *innerIO) run() {
 	}
 }
 
-//lockDelDir ...对文件加锁读取,定时删除目录
+// lockDelDir ...对文件加锁读取,定时删除目录
 func (i *innerIO) lockDelDir() (err error) {
 	i.Lock()
 	fName := i.f.Name()
@@ -194,7 +194,7 @@ func (i *innerIO) lockDelDir() (err error) {
 	return
 }
 
-//flushAndCloseFile ...在close channel 触发
+// flushAndCloseFile ...在close channel 触发
 func (i *innerIO) flushAndCloseFile() (err error) {
 	i.Lock()
 	defer i.Unlock()
@@ -204,7 +204,7 @@ func (i *innerIO) flushAndCloseFile() (err error) {
 	return i.f.Close()
 }
 
-//Flush 将数据刷入到磁盘
+// Flush 将数据刷入到磁盘
 func (i *innerIO) Flush() (err error) {
 	i.Lock()
 	err = i.flush()
@@ -212,7 +212,7 @@ func (i *innerIO) Flush() (err error) {
 	return
 }
 
-//flush ...从缓存中将数据刷入到文件中
+// flush ...从缓存中将数据刷入到文件中
 func (i *innerIO) flush() (err error) {
 	if i.buf.Len() == 0 {
 		return
@@ -230,7 +230,7 @@ func (i *innerIO) flush() (err error) {
 	return
 }
 
-//getCurrentFileSize ...获取当前打开的文件的大小
+// getCurrentFileSize ...获取当前打开的文件的大小
 func (i *innerIO) getCurrentFileSize() (fSize int) {
 	fInfo, _ := i.f.Stat()
 	fSize = int(fInfo.Size())
@@ -256,10 +256,10 @@ func (i *innerIO) Write(p []byte) (n int, err error) {
 	return
 }
 
-//todayStr 获取当前日期字符串
+// todayStr 获取当前日期字符串
 func (i *innerIO) todayStr() string { return TimeNow().Format(i.dateFormat) }
 
-//获取最近...天的日期字符串
+// 获取最近...天的日期字符串
 func (i *innerIO) latestNDayStr() []string {
 	days := make([]string, 0)
 	for a := 0; a < i.opt.SaveDays; a++ {
@@ -269,7 +269,7 @@ func (i *innerIO) latestNDayStr() []string {
 	return days
 }
 
-//获取文件名命名的目录+日期后缀的目录名
+// 获取文件名命名的目录+日期后缀的目录名
 func (*innerIO) fileDirWithDaySuffix(filePath, day string) string {
 	dir := filepath.Dir(filePath)
 	f1 := strings.Replace(filepath.Base(filePath), filepath.Ext(filePath), "", -1)
@@ -283,11 +283,11 @@ func (*innerIO) fileExists(name string) bool {
 	return true
 }
 
-//fileCopyWithIndex ...
-//获取目录中的文件数目,填充6位数字,加上原文件扩展名,并将原文件完整拷贝到新文件
-//创建或者获取一个新的目录,目录加上文件名前缀,以当日日期结尾
-//遍历目录,找到指定拷贝的文件后缀类型的文件个数
-//拷贝文件
+// fileCopyWithIndex ...
+// 获取目录中的文件数目,填充6位数字,加上原文件扩展名,并将原文件完整拷贝到新文件
+// 创建或者获取一个新的目录,目录加上文件名前缀,以当日日期结尾
+// 遍历目录,找到指定拷贝的文件后缀类型的文件个数
+// 拷贝文件
 func (i *innerIO) fileCopyWithIndex() (err error) {
 	fileSrc := i.f
 	fileStat, err := fileSrc.Stat()
@@ -338,7 +338,7 @@ func (i *innerIO) fileCopyWithIndex() (err error) {
 	return
 }
 
-//autoDelDir ...自动删除过期日志目录
+// autoDelDir ...自动删除过期日志目录
 func (i *innerIO) autoDelDir(rootFilePath string) (err error) {
 	if !i.fileExists(rootFilePath) {
 		return

@@ -25,7 +25,7 @@ import (
 	"github.com/atcharles/gof/v2/g2util"
 )
 
-//Mysql ...
+// Mysql ...
 type Mysql struct {
 	Config    *g2util.Config   `inject:""`
 	Grace     *g2util.Graceful `inject:""`
@@ -40,23 +40,23 @@ type Mysql struct {
 	tables []interface{}
 }
 
-//Tables ...
+// Tables ...
 func (m *Mysql) Tables() []interface{} { return m.tables }
 
 // Constructor New ...
 func (m *Mysql) Constructor() { m.tables = make([]interface{}, 0) }
 
-//AfterShutdown ...
+// AfterShutdown ...
 func (m *Mysql) AfterShutdown() {
 	if m.eg != nil {
 		_ = m.eg.Close()
 	}
 }
 
-//Engine ...
+// Engine ...
 func (m *Mysql) Engine() *xorm.Engine { return m.eg }
 
-//Dial MySQL连接拨号
+// Dial MySQL连接拨号
 func (m *Mysql) Dial() {
 	if e := m.dial(); e != nil {
 		log.Fatalf("数据库连接失败:%s\n", e.Error())
@@ -67,12 +67,12 @@ func (m *Mysql) Dial() {
 	m.Grace.RegProcessor(m.Redis)
 }
 
-//Insert ...
+// Insert ...
 func (m *Mysql) Insert(bean interface{}) error {
 	return m.TXCallback(func(sn *xorm.Session) error { return m.Session(sn).Insert(bean) })
 }
 
-//Update ...
+// Update ...
 func (m *Mysql) Update(bean interface{}, params ...interface{}) (newBean interface{}, err error) {
 	err = m.TXCallback(func(sn *xorm.Session) error {
 		v, e := m.Session(sn).Update(bean, params...)
@@ -85,20 +85,20 @@ func (m *Mysql) Update(bean interface{}, params ...interface{}) (newBean interfa
 	return
 }
 
-//Delete ...
+// Delete ...
 func (m *Mysql) Delete(bean interface{}) (err error) {
 	return m.TXCallback(func(sn *xorm.Session) error { return m.Session(sn).Delete(bean) })
 }
 
-//Session ...
+// Session ...
 func (m *Mysql) Session(sn *xorm.Session) *Session { return newSession(m, sn) }
 
-//DelCache ...
+// DelCache ...
 func (m *Mysql) DelCache(bean interface{}, condition ...interface{}) (err error) {
 	return m.Redis.PubDelCache(m.CacheMemKeys(bean, condition...))
 }
 
-//CacheMemKeys ...
+// CacheMemKeys ...
 func (m *Mysql) CacheMemKeys(bean interface{}, condition ...interface{}) (list []string) {
 	queryList := new(cacheBind).Values(bean, condition...)
 	list = make([]string, 0)
@@ -108,7 +108,7 @@ func (m *Mysql) CacheMemKeys(bean interface{}, condition ...interface{}) (list [
 	return
 }
 
-//CacheRestore ...
+// CacheRestore ...
 func (m *Mysql) CacheRestore(bean interface{}) (err error) {
 	val, err := json.Marshal(bean)
 	if err != nil {
@@ -123,17 +123,17 @@ func (m *Mysql) CacheRestore(bean interface{}) (err error) {
 	return
 }
 
-//CacheGet ...
+// CacheGet ...
 func (m *Mysql) CacheGet(bean interface{}, condition ...interface{}) (err error) {
 	return m.cacheGet(bean, []string{"Unscoped"}, condition...)
 }
 
-//CacheGetWrapSession ...
+// CacheGetWrapSession ...
 func (m *Mysql) CacheGetWrapSession(bean interface{}, arg interface{}, condition ...interface{}) (err error) {
 	return m.cacheGet(bean, arg, condition...)
 }
 
-//ErrorMysqlNotFound ...
+// ErrorMysqlNotFound ...
 type ErrorMysqlNotFound string
 
 func (e ErrorMysqlNotFound) Error() string { return string(e) }
@@ -186,7 +186,7 @@ func (m *Mysql) cacheGet(bean interface{}, arg interface{}, condition ...interfa
 	return json.Unmarshal(bts, bean)
 }
 
-//Migrate ...数据库初始化
+// Migrate ...数据库初始化
 func (m *Mysql) Migrate() {
 	d := g2util.TimeExcWrap(func() {
 		if e := m.migrate(); e != nil {
@@ -210,7 +210,7 @@ func (m *Mysql) migrate() (err error) {
 	return
 }
 
-//TXCallback ...
+// TXCallback ...
 func (m *Mysql) TXCallback(fn func(sn *xorm.Session) (err error)) (err error) {
 	sn := m.eg.NewSession()
 	defer func() { _ = sn.Close() }() //不管是否存在err,总是close
@@ -230,7 +230,7 @@ func (m *Mysql) TXCallback(fn func(sn *xorm.Session) (err error)) (err error) {
 	return
 }
 
-//GetOut ...
+// GetOut ...
 func (m *Mysql) GetOut() io.Writer { return m.getOut() }
 func (m *Mysql) getOut() io.Writer {
 	m.mu.Lock()
@@ -241,7 +241,7 @@ func (m *Mysql) getOut() io.Writer {
 	return m.out
 }
 
-//DbName ...
+// DbName ...
 func (m *Mysql) DbName() string {
 	v := m.Config.Viper()
 	db := v.GetString("mysql.db")
@@ -251,7 +251,7 @@ func (m *Mysql) DbName() string {
 	return db
 }
 
-//getDataSource ...
+// getDataSource ...
 func (m *Mysql) getDataSource(args ...bool) string {
 	//withDB, 当需要将链接db去除时(创建数据库),设置为false
 	withDB := true
@@ -315,7 +315,7 @@ func (m *Mysql) dial() (err error) {
 	return
 }
 
-//DropDatabase ...
+// DropDatabase ...
 func (m *Mysql) DropDatabase() (err error) {
 	log.Println("删除数据库")
 	sq := fmt.Sprintf(`DROP DATABASE IF EXISTS %s;`, m.DbName())
@@ -328,7 +328,7 @@ func (m *Mysql) createDB() (err error) {
 	return m.ExecSqOnNewEngine(createDBSql)
 }
 
-//ExecSqOnNewEngine ...
+// ExecSqOnNewEngine ...
 func (m *Mysql) ExecSqOnNewEngine(sq string) (err error) {
 	dataSource := m.getDataSource(false)
 	dba, err := xorm.NewEngine("mysql", dataSource)
@@ -342,7 +342,7 @@ func (m *Mysql) ExecSqOnNewEngine(sq string) (err error) {
 	return
 }
 
-//TableRegister ...注册表,用于同步数据表 ... 等
+// TableRegister ...注册表,用于同步数据表 ... 等
 func (m *Mysql) TableRegister(tables ...interface{}) {
 	_f1hasTable := func(tb interface{}) bool {
 		for _, t1 := range m.tables {
@@ -362,7 +362,7 @@ func (m *Mysql) TableRegister(tables ...interface{}) {
 	}
 }
 
-//Sync ...初始化数据表,结构,数据等
+// Sync ...初始化数据表,结构,数据等
 func (m *Mysql) Sync() (err error) { return m.sync() }
 func (m *Mysql) sync() (err error) {
 	return m.TXCallback(func(sn *xorm.Session) (e error) {
@@ -424,10 +424,10 @@ type (
 	ItfInitData interface{ InitData() []interface{} }
 )
 
-//SetSn ...
+// SetSn ...
 func (c *CompoundIndex) SetSn(sn *xorm.Session) { c.sn = sn }
 
-//makeQuery ...
+// makeQuery ...
 func (c *CompoundIndex) makeQuery() string {
 	if !c.Unique {
 		return ""
@@ -444,7 +444,7 @@ func (c *CompoundIndex) makeQuery() string {
 	return strings.Join(list, " AND ")
 }
 
-//execCreate ...创建索引
+// execCreate ...创建索引
 func (c *CompoundIndex) execCreate(table string) (err error) {
 	if c.sn == nil {
 		panic("orm Session is nil!")
@@ -497,16 +497,16 @@ func (c *CompoundIndex) execCreate(table string) (err error) {
 	return
 }
 
-//TableName ...
+// TableName ...
 func TableName(bean interface{}) string { return tableName(bean) }
 
-//FieldName ...
+// FieldName ...
 func FieldName(field string) (name string) { return names.LintGonicMapper.Obj2Table(field) }
 
-//tableName CacheTableName ...
-//redis-key = /h/tableName
-//2020/3/30 22:11 -- Author:charles
-//func CacheTableName(table interface{}) string { return tableName(table) }
+// tableName CacheTableName ...
+// redis-key = /h/tableName
+// 2020/3/30 22:11 -- Author:charles
+// func CacheTableName(table interface{}) string { return tableName(table) }
 func tableName(table interface{}) string {
 	/*tnBean, ok := table.(names.TableName)
 	if ok {
@@ -517,27 +517,27 @@ func tableName(table interface{}) string {
 	return names.GetTableName(names.LintGonicMapper, reflect.ValueOf(table))
 }
 
-//fieldName 获取模型对象字段 => 数据库的字段名
-//参与缓存的字段,tag中不能有自定义的 name (字段名)
+// fieldName 获取模型对象字段 => 数据库的字段名
+// 参与缓存的字段,tag中不能有自定义的 name (字段名)
 func fieldName(field string) (name string) { return names.LintGonicMapper.Obj2Table(field) }
 
-//memKey ...
+// memKey ...
 func memKey(b interface{}, key string) string { return fmt.Sprintf("%s::%s", tableName(b), key) }
 
-//MyBase1 id and created
+// MyBase1 id and created
 type MyBase1 struct {
 	ID      int64            `json:"id,omitempty" xorm:"pk autoincr"`
 	Created *g2util.JSONTime `json:"created,omitempty" xorm:"notnull default CURRENT_TIMESTAMP created index comment('创建时间')"`
 }
 
-//MyBase xorm MySQL model base
+// MyBase xorm MySQL model base
 type MyBase struct {
 	MyBase1 `xorm:"extends"`
 	Updated *g2util.JSONTime `json:"updated,omitempty" xorm:"notnull default CURRENT_TIMESTAMP updated comment('更新时间')"`
 	Version int64            `json:"version,omitempty" xorm:"notnull default 1 version comment('乐观锁')"`
 }
 
-//ClearColumns ...
+// ClearColumns ...
 func (m *MyBase) ClearColumns() {
 	m.Version = 0
 	m.Created = nil

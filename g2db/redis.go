@@ -14,7 +14,7 @@ import (
 	"github.com/atcharles/gof/v2/json"
 )
 
-//constants defined
+// constants defined
 const (
 	redisSubChannel     = "Sub"
 	redisSubDelMemCache = "DelMemCache"
@@ -50,13 +50,13 @@ func (r *redisObj) AfterShutdown() {
 	r.mp.Range(func(_, value interface{}) bool { _ = value.(*redis.Client).Close(); return true })
 }
 
-//PubDelCache ...
+// PubDelCache ...
 func (r *redisObj) PubDelCache(keys []string) error { return r.Pub(r.pubDelMemName(), keys) }
 
-//PubDelMemAll ...
+// PubDelMemAll ...
 func (r *redisObj) PubDelMemAll() error { return r.Pub(r.formatWithAppName(redisSubDelMemAll), nil) }
 
-//Pub ...
+// Pub ...
 func (r *redisObj) Pub(name string, data interface{}) error {
 	bd, err := json.Marshal(data)
 	if err != nil {
@@ -73,7 +73,7 @@ func (r *redisObj) Pub(name string, data interface{}) error {
 
 func (r *redisObj) SubHandle(name string, handler RedisSubHandlerFunc) { r.subHandlers[name] = handler }
 
-//Subscribe ...
+// Subscribe ...
 func (r *redisObj) Subscribe() {
 	r.subHandlers = make(map[string]RedisSubHandlerFunc)
 	r.closeSub = make(chan struct{})
@@ -85,7 +85,7 @@ func (r *redisObj) Subscribe() {
 	}
 }
 
-//subAction ...
+// subAction ...
 func (r *redisObj) subAction(sub *redis.PubSub) {
 	for {
 		select {
@@ -130,7 +130,7 @@ func (r *redisObj) subscribe() (err error) {
 	return
 }
 
-//Client ...
+// Client ...
 func (r *redisObj) Client(db ...int) *redis.Client { return r.client(db...) }
 func (r *redisObj) client(dbs ...int) *redis.Client {
 	db := 0
@@ -152,7 +152,7 @@ func (r *redisObj) client(dbs ...int) *redis.Client {
 	return cl
 }
 
-//newOption ...
+// newOption ...
 func (r *redisObj) newOption(db int) *redis.Options {
 	cfg := r.Config.Viper().GetStringMapString("redis")
 	svAddr := r.Config.Viper().GetString("global.host")
@@ -166,17 +166,17 @@ func (r *redisObj) newOption(db int) *redis.Options {
 	}
 }
 
-//subChannel ...
+// subChannel ...
 func (r *redisObj) subChannel() string {
 	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), redisSubChannel)
 }
 
-//pubDelMemName ...
+// pubDelMemName ...
 func (r *redisObj) pubDelMemName() string {
 	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), redisSubDelMemCache)
 }
 
-//formatWithAppName ...
+// formatWithAppName ...
 func (r *redisObj) formatWithAppName(s string) string {
 	return fmt.Sprintf("%s_%s", r.Config.Viper().GetString("name"), s)
 }

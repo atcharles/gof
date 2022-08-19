@@ -27,7 +27,7 @@ var (
 	_ = New()
 )
 
-//New ...
+// New ...
 func New(opts ...*Option) RPCServer {
 	s := &server{
 		run:    1,
@@ -59,7 +59,7 @@ type (
 	}
 )
 
-//Opt ...
+// Opt ...
 func (s *server) Opt() *Option { return s.opt }
 
 // Stop stops reading new requests, waits for stopPendingRequestTimeout to allow pending
@@ -84,7 +84,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.Handler(r.Context(), w, r)
 }
 
-//RegisterForApp ...
+// RegisterForApp ...
 func (s *server) RegisterForApp(app interface{}) {
 	if _app, ok := app.(ItfExcludeMethod); ok {
 		s.excludeMethods = _app.ExcludeMethod()
@@ -95,7 +95,7 @@ func (s *server) RegisterForApp(app interface{}) {
 	}
 }
 
-//Register ...
+// Register ...
 func (s *server) Register(receiver interface{}, names ...string) {
 	var _fnGetServiceName = func(rv interface{}) string {
 		rvv := g2util.ValueIndirect(reflect.ValueOf(rv))
@@ -145,7 +145,7 @@ func (s *server) Register(receiver interface{}, names ...string) {
 	}
 }
 
-//suitableCallbacks ...
+// suitableCallbacks ...
 func (s *server) suitableCallbacks(receiver interface{}) (callbacks map[string]callback) {
 	callbacks = make(map[string]callback)
 
@@ -185,7 +185,7 @@ func (s *server) suitableCallbacks(receiver interface{}) (callbacks map[string]c
 	return
 }
 
-//formatName ...
+// formatName ...
 func (s *server) formatName(name string) string {
 	if s.opt.SnakeNamespace {
 		name = SnakeString(name)
@@ -193,7 +193,7 @@ func (s *server) formatName(name string) string {
 	return name
 }
 
-//Handler ...
+// Handler ...
 func (s *server) Handler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	// Don't serve if server is stopped.
 	if atomic.LoadInt32(&s.run) == 0 {
@@ -222,7 +222,7 @@ func (s *server) Handler(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 }
 
-//handle ...
+// handle ...
 func (s *server) handle(ctx context.Context, w http.ResponseWriter, r *http.Request, msg *RPCMessage) (err error) {
 	err = json.NewDecoder(r.Body).Decode(msg)
 	_ = r.Body.Close()
@@ -287,7 +287,7 @@ func (s *server) handle(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	return
 }
 
-//stack ...
+// stack ...
 func (s *server) stack(recover interface{}, methodName string) error {
 	msg := fmt.Sprintf("RPC method %s handler crashed: %v", methodName, recover)
 	const size = 64 << 10
@@ -297,7 +297,7 @@ func (s *server) stack(recover interface{}, methodName string) error {
 	return NewError(ErrInternal, msg)
 }
 
-//getCallBack ...
+// getCallBack ...
 func (s *server) getCallBack(elem []string) (cbk callback, err error) {
 	svs, ok := s.services[elem[0]]
 	if !ok {

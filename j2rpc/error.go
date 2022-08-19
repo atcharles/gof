@@ -1,9 +1,9 @@
 package j2rpc
 
-//ErrorCode ... Error codes
+// ErrorCode ... Error codes
 type ErrorCode int
 
-//declared ...
+// declared ...
 const (
 	ErrParse          ErrorCode = -32700
 	ErrInvalidRequest ErrorCode = -32600
@@ -16,7 +16,7 @@ const (
 	ErrForbidden     ErrorCode = 403
 )
 
-//Error ... Error codes
+// Error ... Error codes
 type Error struct {
 	Code    ErrorCode   `json:"code"`
 	Message string      `json:"message"`
@@ -25,7 +25,7 @@ type Error struct {
 
 func (e *Error) Error() string { return e.Message }
 
-//NewError ...
+// NewError ...
 func NewError(code ErrorCode, Msg string, data ...interface{}) *Error {
 	ee := &Error{Code: code, Message: Msg}
 	if len(data) > 0 {

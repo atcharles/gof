@@ -5,10 +5,10 @@ import (
 	"reflect"
 )
 
-//MergeBean ...
-//@Description: merge struct's point, merge src to dst
-//@param dst
-//@param src
+// MergeBean ...
+// @Description: merge struct's point, merge src to dst
+// @param dst
+// @param src
 func MergeBean(dst interface{}, src Map) (err error) {
 	dv1 := reflect.ValueOf(dst)
 	if dv1.Kind() != reflect.Ptr {

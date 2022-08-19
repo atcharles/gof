@@ -10,7 +10,7 @@ import (
 	"github.com/panjf2000/ants/v2"
 )
 
-//GoPool ...goroutine pool
+// GoPool ...goroutine pool
 type GoPool struct {
 	LevelLogger LevelLogger `inject:""`
 	Grace       *Graceful   `inject:""`
@@ -19,7 +19,7 @@ type GoPool struct {
 	pool *ants.Pool
 }
 
-//Constructor ...
+// Constructor ...
 func (g *GoPool) Constructor() {
 	g.wait = new(sync.WaitGroup)
 	g.pool, _ = ants.NewPool(runtime.NumCPU()*100, ants.WithOptions(ants.Options{
@@ -31,18 +31,18 @@ func (g *GoPool) Constructor() {
 	g.Grace.RegProcessor(g)
 }
 
-//AfterShutdown ...
+// AfterShutdown ...
 func (g *GoPool) AfterShutdown() {
 	TimeoutExecFunc(g.wait.Wait, time.Second*30)
 	g.pool.Release()
 }
 
-//Pool ...
+// Pool ...
 func (g *GoPool) Pool() *ants.Pool { return g.pool }
 
 type goFunc func() (err error)
 
-//goFunc ...
+// goFunc ...
 func (g *GoPool) goFuncDo(fn goFunc) {
 	if e := fn(); e != nil {
 		//g.LevelLogger.Warnf("Goroutine worker exits with a error: %s\n\n", e.Error())
@@ -50,7 +50,7 @@ func (g *GoPool) goFuncDo(fn goFunc) {
 	}
 }
 
-//Submit ...
+// Submit ...
 func (g *GoPool) Submit(fn goFunc) {
 	g.wait.Add(1)
 	_ = g.pool.Submit(func() {
@@ -59,5 +59,5 @@ func (g *GoPool) Submit(fn goFunc) {
 	})
 }
 
-//Go ... 直接执行,不加入wait队列
+// Go ... 直接执行,不加入wait队列
 func (g *GoPool) Go(fn goFunc) { _ = g.pool.Submit(func() { g.goFuncDo(fn) }) }

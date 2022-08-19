@@ -20,7 +20,7 @@ type callback struct {
 	errPos int
 }
 
-//makeArgTypes ...
+// makeArgTypes ...
 func (c *callback) makeArgTypes() bool {
 	fnt := c.fn.Type()
 

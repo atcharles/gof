@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-//NewLevelLogger ...
+// NewLevelLogger ...
 func NewLevelLogger(prefix string, out ...io.Writer) LevelLogger {
 	var oo io.Writer = os.Stdout
 	if len(out) > 0 {
@@ -18,7 +18,7 @@ func NewLevelLogger(prefix string, out ...io.Writer) LevelLogger {
 	return &logger{lvl: DebugLevel, lg: lg}
 }
 
-//LevelLogger ...
+// LevelLogger ...
 type LevelLogger interface {
 	SetOutput(io.Writer)
 	Writer() io.Writer
@@ -50,10 +50,10 @@ type logger struct {
 
 func (l *logger) Writer() io.Writer { return l.lg.Writer() }
 
-//SetLevel ...
+// SetLevel ...
 func (l *logger) SetLevel(lvl Level) { l.lvl = lvl }
 
-//out ...
+// out ...
 func (l *logger) out(lvl Level, s string, i ...interface{}) {
 	f1 := fmt.Sprintf("[%s] %s", strings.ToUpper(lvl.String()), s)
 	l.lg.Printf(f1, i...)
@@ -142,7 +142,7 @@ func (l *logger) Panicln(i ...interface{}) {
 	l.lg.Panicln(i...)
 }
 
-//level
+// level
 const (
 	PanicLevel Level = iota
 	FatalLevel
@@ -192,7 +192,7 @@ func ParseLevel(lvl string) Level {
 	}
 }
 
-//MarshalText ...
+// MarshalText ...
 func (level Level) MarshalText() ([]byte, error) {
 	switch level {
 	case TraceLevel:

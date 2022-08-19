@@ -22,7 +22,7 @@ type cacheMem struct {
 	Cache  store.ItfCache     `inject:""`
 }
 
-//RedisSubDelMemAll ...
+// RedisSubDelMemAll ...
 func (c *cacheMem) RedisSubDelMemAll() RedisSubHandlerFunc {
 	return func(_ []byte) {
 		if e := c.Cache.Reset(); e != nil {
@@ -33,7 +33,7 @@ func (c *cacheMem) RedisSubDelMemAll() RedisSubHandlerFunc {
 	}
 }
 
-//RedisSubDelCache ...
+// RedisSubDelCache ...
 func (c *cacheMem) RedisSubDelCache() RedisSubHandlerFunc {
 	var _fnDel = func(p []byte) (err error) {
 		keys := make([]string, 0)
@@ -61,7 +61,7 @@ func (c *cacheMem) RedisSubDelCache() RedisSubHandlerFunc {
 // Constructor New ...
 func (c *cacheMem) Constructor() {}
 
-//Atomic ...
+// Atomic ...
 func (c *cacheMem) Atomic(key string, fn func()) {
 	mu := Locker.Load(fmt.Sprintf("%s:%s", "cacheMem:Atomic", key))
 	mu.Lock()
@@ -69,13 +69,13 @@ func (c *cacheMem) Atomic(key string, fn func()) {
 	mu.Unlock()
 }
 
-//Delete ...
+// Delete ...
 func (c *cacheMem) Delete(key string) {
 	c.Atomic(key, func() { _ = c.Cache.Delete(key) })
 	return
 }
 
-//GetOrStore ...
+// GetOrStore ...
 func (c *cacheMem) GetOrStore(key string, fn func() ([]byte, error)) (data []byte, err error) {
 	c.Atomic(key, func() { data, err = c.getOrStore(key, fn) })
 	return
@@ -107,8 +107,8 @@ func (*cacheBind) cacheValString(v reflect.Value) string {
 	}
 }
 
-//Values ...return bind cache keys
-//used for db get
+// Values ...return bind cache keys
+// used for db get
 func (*cacheBind) Values(bean interface{}, condition ...interface{}) []string {
 	qs := make([]string, 0)
 	mp := make(MapString)
@@ -144,10 +144,10 @@ func (*cacheBind) Values(bean interface{}, condition ...interface{}) []string {
 	return qs
 }
 
-//Slice ...
+// Slice ...
 type Slice []interface{}
 
-//Asc ...
+// Asc ...
 func (s Slice) Asc(call interface{}) Slice {
 	rs, err := gubrak.From(s).OrderBy(call, true).ResultAndError()
 	if err != nil {
@@ -156,7 +156,7 @@ func (s Slice) Asc(call interface{}) Slice {
 	return rs.(Slice)
 }
 
-//MapString ...
+// MapString ...
 type MapString map[string]string
 
 func (mp MapString) findConditionN(val reflect.Value, i int) {

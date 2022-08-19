@@ -8,8 +8,8 @@ import (
 	"github.com/unknwon/com"
 )
 
-//MergeBeans ...
-//合并结构数据
+// MergeBeans ...
+// 合并结构数据
 func MergeBeans(dst interface{}, src interface{}) (err error) {
 	mpDst, err := Bean2Map(src)
 	if err != nil {
@@ -19,7 +19,7 @@ func MergeBeans(dst interface{}, src interface{}) (err error) {
 	return
 }
 
-//Bean2Map ...
+// Bean2Map ...
 func Bean2Map(bean interface{}) (Map, error) {
 	b1, err := json.Marshal(bean)
 	if err != nil {
@@ -49,10 +49,10 @@ func CopyBean(bean interface{}) (newBean interface{}, err error) {
 	return
 }
 
-//MapString ...
+// MapString ...
 type MapString map[string]string
 
-//TransMapStringToMap ...
+// TransMapStringToMap ...
 func (m MapString) TransMapStringToMap() Map {
 	m1 := make(Map)
 	for k, v := range m {
@@ -61,10 +61,10 @@ func (m MapString) TransMapStringToMap() Map {
 	return m1
 }
 
-//Map ...
+// Map ...
 type Map map[string]interface{}
 
-//Merge2Bean ...
+// Merge2Bean ...
 func (m Map) Merge2Bean(bean interface{}) (err error) {
 	mp, err := Bean2Map(bean)
 	if err != nil {
@@ -75,14 +75,14 @@ func (m Map) Merge2Bean(bean interface{}) (err error) {
 	return
 }
 
-//MergeTo ...
+// MergeTo ...
 func (m Map) MergeTo(mp Map) {
 	for k, v := range m {
 		mp[k] = v
 	}
 }
 
-//ToBean ...
+// ToBean ...
 func (m Map) ToBean(bean interface{}) (err error) {
 	bs1, err := json.Marshal(m)
 	if err != nil {
@@ -91,13 +91,13 @@ func (m Map) ToBean(bean interface{}) (err error) {
 	return json.Unmarshal(bs1, bean)
 }
 
-//UnmarshalBinary ...
+// UnmarshalBinary ...
 func (m *Map) UnmarshalBinary(data []byte) error { return json.Unmarshal(data, m) }
 
-//MarshalBinary ...
+// MarshalBinary ...
 func (m Map) MarshalBinary() (data []byte, err error) { return json.Marshal(m) }
 
-//GetString ...
+// GetString ...
 func (m Map) GetString(key string) string {
 	val, ok := m[key]
 	if !ok {
@@ -106,7 +106,7 @@ func (m Map) GetString(key string) string {
 	return com.ToStr(val)
 }
 
-//GetInt64 ...
+// GetInt64 ...
 func (m Map) GetInt64(key string) int64 {
 	val, ok := m[key]
 	if !ok {
@@ -115,7 +115,7 @@ func (m Map) GetInt64(key string) int64 {
 	return com.StrTo(com.ToStr(val)).MustInt64()
 }
 
-//GetInt ...
+// GetInt ...
 func (m Map) GetInt(key string) int {
 	val, ok := m[key]
 	if !ok {
@@ -124,7 +124,7 @@ func (m Map) GetInt(key string) int {
 	return com.StrTo(com.ToStr(val)).MustInt()
 }
 
-//GetBool ...
+// GetBool ...
 func (m Map) GetBool(key string) bool {
 	val, ok := m[key]
 	if !ok {
@@ -134,7 +134,7 @@ func (m Map) GetBool(key string) bool {
 	return a
 }
 
-//Keys ...
+// Keys ...
 func (m Map) Keys() []string {
 	list := make([]string, 0)
 	for k := range m {

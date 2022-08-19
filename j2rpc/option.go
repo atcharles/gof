@@ -4,10 +4,10 @@ import (
 	"reflect"
 )
 
-//SnakeOption ...
+// SnakeOption ...
 var SnakeOption = &Option{SnakeNamespace: true}
 
-//Option ...
+// Option ...
 type Option struct {
 	SnakeNamespace bool
 	BeforeMid      []middleInfo
@@ -52,7 +52,7 @@ func (o *Option) AddBeforeMiddleware(fn interface{}, ls ...[]string) {
 	o.BeforeMid = append(o.BeforeMid, info)
 }
 
-//beforeMiddlewareFuncAction ...
+// beforeMiddlewareFuncAction ...
 func (o *Option) beforeMiddlewareFuncAction(fn interface{}, args ...interface{}) (err error) {
 	if fn == nil {
 		return
@@ -95,7 +95,7 @@ func (o *Option) beforeMiddlewareFuncAction(fn interface{}, args ...interface{})
 	return
 }
 
-//beforeMiddlewareAction ...
+// beforeMiddlewareAction ...
 func (o *Option) beforeMiddlewareAction(args ...interface{}) (err error) {
 	if len(o.BeforeMid) == 0 {
 		return

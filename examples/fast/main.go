@@ -1,11 +1,12 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/henrylee2cn/goutil"
+
 	"github.com/atcharles/gof/v2"
 	"github.com/atcharles/gof/v2/g2util"
 	"github.com/atcharles/gof/v2/j2rpc"
-	"github.com/gin-gonic/gin"
-	"github.com/henrylee2cn/goutil"
 )
 
 type handler struct {
@@ -18,17 +19,17 @@ func (h *handler) J2rpc(j2rpc.RPCServer) {}
 
 type api struct{}
 
-//AddCache ...
+// AddCache ...
 func (*api) AddCache(key string, val string) error {
 	return gof.App.G2cache.Set(key, []byte(val))
 }
 
-//FlushCache ...
+// FlushCache ...
 func (*api) FlushCache() error {
 	return gof.App.G2cache.Reset()
 }
 
-//Get ...
+// Get ...
 func (*api) Get(key string) (interface{}, error) {
 	bts, err := gof.App.G2cache.Get(key)
 	if err != nil {
@@ -37,12 +38,12 @@ func (*api) Get(key string) (interface{}, error) {
 	return string(bts), nil
 }
 
-//Name ...
+// Name ...
 func (*api) Name() interface{} {
 	return goutil.ObjectName(gof.App.G2cache.CacheInstance())
 }
 
-//String ...
+// String ...
 func (*api) String() string { return gof.App.G2cache.String() }
 
 func main() {

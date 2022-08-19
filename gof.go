@@ -12,10 +12,10 @@ import (
 	"github.com/atcharles/gof/v2/j2rpc"
 )
 
-//App ...
+// App ...
 var App = new(Application)
 
-//Application ...
+// Application ...
 type Application struct {
 	Config   *g2util.Config     `inject:""`
 	Logger   g2util.LevelLogger `inject:""`
@@ -35,7 +35,7 @@ type Application struct {
 	populateOnce sync.Once
 }
 
-//Populate ...
+// Populate ...
 func (a *Application) Populate() *Application {
 	a.populateOnce.Do(func() {
 		sysLogger := g2util.NewLevelLogger("[STDOUT]")
@@ -45,14 +45,14 @@ func (a *Application) Populate() *Application {
 	return a
 }
 
-//LoadWithConfig ...
+// LoadWithConfig ...
 func (a *Application) LoadWithConfig(args ...interface{}) *Application {
 	a.Populate()
 	a.Config.Load(args...)
 	return a
 }
 
-//LoadLogger ...
+// LoadLogger ...
 func (a *Application) LoadLogger() *Application {
 	logLevel := g2util.ParseLevel(a.Config.Viper().GetString("global.log_level"))
 	a.Logger.SetLevel(logLevel)
@@ -65,7 +65,7 @@ func (a *Application) LoadLogger() *Application {
 	return a
 }
 
-//Default ...
+// Default ...
 func (a *Application) Default(args ...interface{}) *Application {
 	switch len(args) {
 	case 0:
@@ -77,7 +77,7 @@ func (a *Application) Default(args ...interface{}) *Application {
 	return a
 }
 
-//Run ...
+// Run ...
 func (a *Application) Run() {
 	//加载数据库
 	a.Mysql.Dial()
@@ -85,13 +85,13 @@ func (a *Application) Run() {
 	a.Graceful.WaitForSignal()
 }
 
-//RunServices ...
+// RunServices ...
 func (a *Application) RunServices(val interface{}) {
 	a.Gin.SetJ2Service(val)
 	a.Run()
 }
 
-//RunWithCmd ...
+// RunWithCmd ...
 func (a *Application) RunWithCmd(fn ...func()) {
 	ll := len(fn)
 	if ll > 0 {
@@ -103,7 +103,7 @@ func (a *Application) RunWithCmd(fn ...func()) {
 	a.G2cmd.Execute()
 }
 
-//RunDefault ...
+// RunDefault ...
 func (a *Application) RunDefault(val interface{}) {
 	g2util.InjectPopulate(val, a.Default())
 	db := a.Mysql

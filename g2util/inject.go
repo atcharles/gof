@@ -6,7 +6,7 @@ import (
 	"github.com/facebookgo/inject"
 )
 
-//InjectPopulate ...
+// InjectPopulate ...
 func InjectPopulate(values ...interface{}) {
 	err := inject.Populate(values...)
 	if err != nil {

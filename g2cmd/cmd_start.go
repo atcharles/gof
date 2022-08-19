@@ -18,7 +18,7 @@ type startCmd struct {
 	worker func()
 }
 
-//SetWorker 设置启动程序
+// SetWorker 设置启动程序
 func (s *startCmd) SetWorker(worker func()) { s.worker = worker }
 
 func (s *startCmd) Cmd() *cobra.Command {

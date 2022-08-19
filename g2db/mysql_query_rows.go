@@ -35,7 +35,7 @@ type (
 	}
 )
 
-//GetBeanByTableName ...
+// GetBeanByTableName ...
 func (m *Mysql) GetBeanByTableName(tableStr string) (bean interface{}, err error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -49,7 +49,7 @@ func (m *Mysql) GetBeanByTableName(tableStr string) (bean interface{}, err error
 	return
 }
 
-//QueryTableRows ...查询经过注册的表
+// QueryTableRows ...查询经过注册的表
 func (m *Mysql) QueryTableRows(tableStr string, params *MysqlQueryRowsParams) (rows *MysqlRows, err error) {
 	val, err := m.GetBeanByTableName(tableStr)
 	if err != nil {
@@ -58,24 +58,24 @@ func (m *Mysql) QueryTableRows(tableStr string, params *MysqlQueryRowsParams) (r
 	return m.QueryRows(val, params)
 }
 
-//QueryRows ...分页查询,可以指定表名
+// QueryRows ...分页查询,可以指定表名
 func (m *Mysql) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *MysqlRows, err error) {
 	return NewQuery(m.Engine()).QueryRows(val, params)
 }
 
-//Query ...
-//new(Query).SetDb(*xorm.Engine).QueryRows(val, params)
-//new(Query).SetDb(*xorm.Engine).SetTable(string).QueryRows(val, params)
+// Query ...
+// new(Query).SetDb(*xorm.Engine).QueryRows(val, params)
+// new(Query).SetDb(*xorm.Engine).SetTable(string).QueryRows(val, params)
 type Query struct {
 	db *xorm.Engine
 
 	table string
 }
 
-//SetTable ...
+// SetTable ...
 func (q *Query) SetTable(table string) *Query { q.table = table; return q }
 
-//QueryRows ...
+// QueryRows ...
 func (q *Query) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *MysqlRows, err error) {
 	db := q.db
 	v1 := reflect.ValueOf(val)
@@ -167,5 +167,5 @@ func (q *Query) QueryRows(val interface{}, params *MysqlQueryRowsParams) (rows *
 	return
 }
 
-//NewQuery ...
+// NewQuery ...
 func NewQuery(engine *xorm.Engine) *Query { return &Query{db: engine} }

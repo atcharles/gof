@@ -6,11 +6,11 @@ import (
 	"math/rand"
 )
 
-//CryptoRandInt ...
+// CryptoRandInt ...
 func CryptoRandInt(n int) *big.Int {
 	b, _ := cRand.Int(cRand.Reader, big.NewInt(int64(n)))
 	return b
 }
 
-//MathRandInt ...
+// MathRandInt ...
 func MathRandInt(n int) int { return rand.Intn(n) }

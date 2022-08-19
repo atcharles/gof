@@ -5,14 +5,15 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/atcharles/gof/v2/g2cache/store"
 	"github.com/henrylee2cn/goutil"
 	"github.com/ledisdb/ledisdb/config"
 	"github.com/ledisdb/ledisdb/ledis"
 	"github.com/pkg/errors"
+
+	"github.com/atcharles/gof/v2/g2cache/store"
 )
 
-//LeDis ...
+// LeDis ...
 type LeDis struct {
 	cfg *config.Config
 	inc *ledis.Ledis
@@ -36,10 +37,10 @@ func (l *LeDis) Instance() *ledis.Ledis {
 func (l *LeDis) SetDB(db *ledis.DB) { l.db = db }
 func (l *LeDis) DB() *ledis.DB      { l.Instance(); return l.db }
 
-//StoreRoot ...
+// StoreRoot ...
 var StoreRoot = goutil.SelfDir()
 
-//SetInstance ...
+// SetInstance ...
 func (l *LeDis) SetInstance(cfg *config.Config) (err error) {
 	if cfg == nil {
 		cfg = config.NewConfigDefault()
@@ -58,22 +59,22 @@ func (l *LeDis) SetInstance(cfg *config.Config) (err error) {
 	return
 }
 
-//New ...
+// New ...
 func (*LeDis) New() *LeDis {
 	ln := new(LeDis)
 	ln.Constructor()
 	return ln
 }
 
-//Constructor ...
+// Constructor ...
 func (l *LeDis) Constructor() {}
 
 func (l *LeDis) String() string { return "ledis" }
 
-//Set ...
+// Set ...
 func (l *LeDis) Set(key string, data []byte) (err error) { return l.DB().Set([]byte(key), data) }
 
-//Get ...
+// Get ...
 func (l *LeDis) Get(key string) (data []byte, err error) {
 	data, err = l.DB().Get([]byte(key))
 	if err != nil {
@@ -86,19 +87,19 @@ func (l *LeDis) Get(key string) (data []byte, err error) {
 	return
 }
 
-//Delete ...
+// Delete ...
 func (l *LeDis) Delete(key string) (err error) {
 	_, err = l.DB().Del([]byte(key))
 	return
 }
 
-//Reset ...
+// Reset ...
 func (l *LeDis) Reset() (err error) {
 	_, err = l.DB().FlushAll()
 	return
 }
 
-//CacheInstance ...
+// CacheInstance ...
 func (l *LeDis) CacheInstance() store.ItfCache { return l }
 
 func init() {
