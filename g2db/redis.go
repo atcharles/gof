@@ -47,7 +47,6 @@ type (
 
 func (r *redisObj) AfterShutdown() {
 	close(r.closeSub)
-	r.mp.Range(func(_, value interface{}) bool { _ = value.(*redis.Client).Close(); return true })
 }
 
 // PubDelCache ...
@@ -92,6 +91,7 @@ func (r *redisObj) subAction(sub *redis.PubSub) {
 		case <-r.closeSub:
 			_ = sub.Close()
 			r.Logger.Debugf("[SUB] Redis关闭订阅")
+			r.mp.Range(func(_, value interface{}) bool { _ = value.(*redis.Client).Close(); return true })
 			return
 		case msg, ok := <-sub.Channel():
 			if !ok || msg == nil {
