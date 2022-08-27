@@ -342,6 +342,17 @@ func (m *Mysql) ExecSqOnNewEngine(sq string) (err error) {
 	return
 }
 
+// DialWithMysql ......
+func (m *Mysql) DialWithMysql(fn func(x *xorm.Engine) error) (err error) {
+	dataSource := m.getDataSource(false)
+	dba, err := xorm.NewEngine("mysql", dataSource)
+	if err != nil {
+		return
+	}
+	defer func() { _ = dba.Close() }()
+	return fn(dba)
+}
+
 // TableRegister ...注册表,用于同步数据表 ... 等
 func (m *Mysql) TableRegister(tables ...interface{}) {
 	_f1hasTable := func(tb interface{}) bool {
