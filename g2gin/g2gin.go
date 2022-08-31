@@ -45,7 +45,7 @@ func (g *G2gin) Run() {
 	eg.Use(gin.Recovery())
 	const pathPrefix = "/"
 	g1 := eg.Group(pathPrefix)
-	g1.Use(MiddlewareLimiter(g.Config))
+	//g1.Use(MiddlewareLimiter(g.Config))
 	if apiRoot := strings.TrimPrefix(cast.ToString(v["api_root"]), pathPrefix); len(apiRoot) > 0 {
 		g1 = g1.Group(pathPrefix + apiRoot)
 	}
