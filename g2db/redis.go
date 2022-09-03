@@ -35,6 +35,7 @@ type (
 		mp sync.Map
 
 		closeSub chan struct{}
+		isClose  bool
 
 		subHandlers map[string]RedisSubHandlerFunc
 	}
@@ -46,6 +47,17 @@ type (
 )
 
 func (r *redisObj) AfterShutdown() {
+	r.closeRedisSub()
+}
+
+// close ......
+func (r *redisObj) closeRedisSub() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.isClose {
+		return
+	}
+	r.isClose = true
 	close(r.closeSub)
 }
 
