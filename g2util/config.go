@@ -4,7 +4,9 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/henrylee2cn/goutil"
@@ -107,6 +109,54 @@ func (c *Config) load(args ...interface{}) (err error) {
 	if err = v.ReadInConfig(); err != nil {
 		return
 	}
+	if err = c.LoadFromTemp(); err != nil {
+		return
+	}
 	c.viper.WatchConfig()
 	return
+}
+
+func getRoot() string {
+	ex, _ := os.Executable()
+	if strings.Contains(ex, "go-build") {
+		return "."
+	}
+	return filepath.Dir(ex)
+}
+
+// TempFile ......
+func (c *Config) TempFile() string {
+	return filepath.Join(getRoot(), "conf_temp.yml")
+}
+
+// WriteToTemp ......
+func (c *Config) WriteToTemp(fn func(v *viper.Viper)) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	fn(c.viper)
+	return c.viper.WriteConfigAs(c.TempFile())
+}
+
+// LoadFromTemp ......
+func (c *Config) LoadFromTemp() error {
+	tempFile := c.TempFile()
+	if _, e := os.Stat(tempFile); e != nil {
+		return nil
+	}
+	v := viper.New()
+	v.SetConfigFile(tempFile)
+	if e := v.ReadInConfig(); e != nil {
+		return e
+	}
+	if c.viper == nil {
+		return nil
+	}
+	if e := c.viper.MergeConfigMap(v.AllSettings()); e != nil {
+		return e
+	}
+	if e := c.viper.WriteConfig(); e != nil {
+		return e
+	}
+	_ = os.Remove(tempFile)
+	return nil
 }

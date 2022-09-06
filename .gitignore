@@ -28,3 +28,6 @@ tests
 logs
 *.log
 go.sum
+conf.yml
+conf_*.yml
+*_temp*
