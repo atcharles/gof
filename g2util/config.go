@@ -126,7 +126,9 @@ func getRoot() string {
 
 // TempFile ......
 func (c *Config) TempFile() string {
-	return filepath.Join(getRoot(), "conf_temp.yml")
+	s := filepath.Join(getRoot(), "data", "conf_temp.yml")
+	_ = os.MkdirAll(filepath.Dir(s), 0755)
+	return s
 }
 
 // WriteToTemp ......
