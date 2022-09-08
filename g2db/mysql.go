@@ -56,6 +56,9 @@ func (m *Mysql) AfterShutdown() {
 // Engine ...
 func (m *Mysql) Engine() *xorm.Engine { return m.eg }
 
+// SetEngine ......
+func (m *Mysql) SetEngine(e *xorm.Engine) { m.eg = e }
+
 // Dial MySQL连接拨号
 func (m *Mysql) Dial() {
 	if e := m.dial(); e != nil {
