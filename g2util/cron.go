@@ -42,11 +42,11 @@ func (c *G2cron) execFunc(shellStr string) {
 func (c *G2cron) OnProcessStart() {
 	c.cron.Start()
 
-	c.AddTask("1 0 * * * *", func() {
+	/*c.AddTask("1 0 * * * *", func() {
 		//同步时间
 		//shellCmd := "ntpdate -u ntp1.aliyun.com && hwclock --systohc"
 		//shellCmd := `date -s "$(curl -s --head https://www.baidu.com | grep ^Date: | sed 's/Date: //g')" && hwclock --systohc`
 		shellCmd := "ntpdate -u ntp1.aliyun.com"
 		c.execFunc(shellCmd)
-	})
+	})*/
 }
