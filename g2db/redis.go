@@ -28,8 +28,8 @@ type (
 	redisObj struct {
 		Logger g2util.LevelLogger `inject:""`
 		Config *g2util.Config     `inject:""`
-		Go     *g2util.GoPool     `inject:""`
-		Cache  *cacheMem          `inject:""`
+		//Go     *g2util.GoPool     `inject:""`
+		Cache *cacheMem `inject:""`
 
 		mu sync.RWMutex
 		mp sync.Map
@@ -123,7 +123,9 @@ func (r *redisObj) subAction(sub *redis.PubSub) {
 				_d1 := make(json.RawMessage, 0)
 				payloadData = &_d1
 			}
-			r.Go.Go(func() (err error) { r.subHandlers[payload.Name](*payloadData); return })
+			if handler, _ok := r.subHandlers[payload.Name]; _ok {
+				handler(*payloadData)
+			}
 		}
 	}
 }

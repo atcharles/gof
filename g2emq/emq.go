@@ -20,7 +20,8 @@ var EmqInstance *Emq
 
 // Emq ...
 type Emq struct {
-	Config *g2util.Config `inject:""`
+	Config *g2util.Config     `inject:""`
+	Logger g2util.LevelLogger `inject:""`
 
 	opt         *mqtt.ClientOptions
 	client      mqtt.Client
@@ -28,6 +29,8 @@ type Emq struct {
 	retained    bool
 	wait        time.Duration
 	topicPrefix string
+
+	pubC chan func()
 }
 
 // prepareOption ...
@@ -68,7 +71,33 @@ func (e *Emq) Constructor() {
 	e.qos = 1
 	e.retained = false
 	e.wait = time.Second * 2
+	e.pubC = make(chan func(), 1000)
 	EmqInstance = e
+}
+
+// Start ...
+func (e *Emq) Start() {
+	go func() {
+		for {
+			select {
+			case f := <-e.pubC:
+				f()
+			}
+		}
+	}()
+}
+
+// PublishC ......
+func (e *Emq) PublishC(topic string, payload interface{}) {
+	select {
+	case e.pubC <- func() {
+		if err := e.Publish(topic, payload); err != nil {
+			e.Logger.Errorf("[EMQ Publish] [E] topic %s error: %s", topic, err.Error())
+		}
+	}:
+	case <-time.After(time.Millisecond * 100):
+		e.Logger.Errorf("[EMQ Publish] [E] publish topic %s timeout", topic)
+	}
 }
 
 // Publish ...
@@ -104,7 +133,10 @@ func (e *Emq) Subscribe(topic string, callback mqtt.MessageHandler) (err error) 
 func (e *Emq) Dial() {
 	if err := e.dial(); err != nil {
 		log.Fatalln(err)
+		return
 	}
+	e.Logger.Infof("emqx client connected")
+	e.Start()
 }
 
 // dial ...
