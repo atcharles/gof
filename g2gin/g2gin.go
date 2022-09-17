@@ -168,9 +168,13 @@ func (g *G2gin) useCors(rg *gin.RouterGroup) {
 
 // profServer ...
 func (g *G2gin) profServer() {
+	port1 := g.Config.Viper().GetString("global.pprof_port")
+	if port1 == "" {
+		return
+	}
 	//go get -u github.com/google/pprof
 	//需要安装 graphviz
 	//pprof -http=:8080 http://127.0.0.1:301/debug/pprof/profile\?seconds\=10
-	srv := &http.Server{Addr: g.Config.Viper().GetString("global.pprof_port"), Handler: nil}
+	srv := &http.Server{Addr: port1, Handler: nil}
 	g.Graceful.RegHTTPServer(srv)
 }
