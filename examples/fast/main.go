@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/andeya/goutil"
 	"github.com/gin-gonic/gin"
-	"github.com/henrylee2cn/goutil"
 
 	"github.com/atcharles/gof/v2"
 	"github.com/atcharles/gof/v2/g2util"

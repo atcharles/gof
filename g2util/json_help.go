@@ -3,7 +3,7 @@ package g2util
 import (
 	"encoding/base64"
 
-	"github.com/henrylee2cn/goutil"
+	"github.com/andeya/goutil"
 
 	"github.com/atcharles/gof/v2/json"
 )

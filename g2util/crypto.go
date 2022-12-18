@@ -3,7 +3,7 @@ package g2util
 import (
 	"strings"
 
-	"github.com/henrylee2cn/goutil"
+	"github.com/andeya/goutil"
 	"github.com/pkg/errors"
 )
 

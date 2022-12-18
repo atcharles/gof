@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/henrylee2cn/goutil"
+	"github.com/andeya/goutil"
 	"github.com/panjf2000/ants/v2"
 )
 

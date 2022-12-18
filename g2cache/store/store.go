@@ -3,7 +3,6 @@ package store
 import (
 	"errors"
 	"fmt"
-	"log"
 )
 
 // ItfCache ...
@@ -22,7 +21,7 @@ var ins = make(map[string]ItfCache)
 func Register(s ItfCache) {
 	name := s.String()
 	if _, ok := ins[name]; ok {
-		log.Println(fmt.Sprintf("store %s is registered", s))
+		//log.Printf("store %s is registered\n", s)
 		return
 	}
 	ins[name] = s

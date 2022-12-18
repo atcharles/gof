@@ -26,7 +26,7 @@ func (c *G2cron) AddTask(spec string, fn func()) {
 }
 
 // execFunc ...
-func (c *G2cron) execFunc(shellStr string) {
+/*func (c *G2cron) execFunc(shellStr string) {
 	out, e := StdExec(shellStr).CombinedOutput()
 	if len(out) > 0 {
 		c.Logger.Debugf("%s", out)
@@ -36,7 +36,7 @@ func (c *G2cron) execFunc(shellStr string) {
 		return
 	}
 	c.Logger.Debugf("[Run] %s", shellStr)
-}
+}*/
 
 // OnProcessStart ...启动定时任务
 func (c *G2cron) OnProcessStart() {

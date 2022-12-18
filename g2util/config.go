@@ -2,14 +2,13 @@ package g2util
 
 import (
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 
-	"github.com/henrylee2cn/goutil"
+	"github.com/andeya/goutil"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 )
@@ -93,8 +92,8 @@ func (c *Config) load(args ...interface{}) (err error) {
 	}
 	_fn1entry := func(dirName string) {
 		v.AddConfigPath(dirName)
-		var entries []fs.FileInfo
-		entries, err = ioutil.ReadDir(dirName)
+		var entries []fs.DirEntry
+		entries, err = os.ReadDir(dirName)
 		if err != nil {
 			return
 		}

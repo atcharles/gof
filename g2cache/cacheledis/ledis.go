@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/henrylee2cn/goutil"
+	"github.com/andeya/goutil"
 	"github.com/ledisdb/ledisdb/config"
 	"github.com/ledisdb/ledisdb/ledis"
 	"github.com/pkg/errors"

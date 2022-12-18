@@ -1,6 +1,7 @@
 package cachebig
 
 import (
+	"context"
 	"time"
 
 	"github.com/allegro/bigcache/v3"
@@ -27,7 +28,7 @@ func (b *BigCache) Constructor() {
 	var err error
 	cfg := bigcache.DefaultConfig(time.Minute * 10)
 	cfg.Verbose = false
-	b.inc, err = bigcache.NewBigCache(cfg)
+	b.inc, err = bigcache.New(context.Background(), cfg)
 	if err != nil {
 		panic(err)
 	}

@@ -79,10 +79,8 @@ func (e *Emq) Constructor() {
 func (e *Emq) Start() {
 	go func() {
 		for {
-			select {
-			case f := <-e.pubC:
-				f()
-			}
+			f := <-e.pubC
+			f()
 		}
 	}()
 }

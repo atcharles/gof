@@ -72,7 +72,6 @@ func (c *cacheMem) Atomic(key string, fn func()) {
 // Delete ...
 func (c *cacheMem) Delete(key string) {
 	c.Atomic(key, func() { _ = c.Cache.Delete(key) })
-	return
 }
 
 // GetOrStore ...
