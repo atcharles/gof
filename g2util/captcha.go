@@ -31,7 +31,10 @@ func (c *Captcha) Constructor() {
 }
 
 // Generate ...
-func (c *Captcha) Generate() (id, b64s string, err error) { return c.cap.Generate() }
+func (c *Captcha) Generate() (id, b64s string, err error) {
+	id, b64s, _, err = c.cap.Generate()
+	return
+}
 
 // Verify ...
 func (c *Captcha) Verify(id, answer string) (match bool) { return c.cap.Verify(id, answer, true) }
