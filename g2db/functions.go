@@ -27,16 +27,14 @@ func initializeTables(table ItfInitData, sn *xorm.Session) (err error) {
 	//2021/6/22 2:13 上午 -- Author:charles
 	count, _err := sn.Count(table)
 	if _err != nil {
-		return _err
+		return fmt.Errorf("[InitData] [%s] Count error: %w", tbName, _err)
 	}
 	if count > 0 {
 		return
 	}
 
 	sq1 := fmt.Sprintf(`truncate table %s;`, tbName)
-	if _, err = sn.Exec(sq1); err != nil {
-		return
-	}
+	_, _ = sn.Exec(sq1)
 	if _, err = sn.Insert(beans...); err != nil {
 		err = errors.Errorf("[InitData] [%s] error: %s", tbName, err.Error())
 		return
@@ -49,7 +47,8 @@ func HasError(e error) (bool, error) {
 	if e == nil {
 		return true, e
 	}
-	if _, ok := e.(ErrorMysqlNotFound); ok || e == redis.Nil {
+	var errorMysqlNotFound ErrorMysqlNotFound
+	if errors.As(e, &errorMysqlNotFound) || errors.Is(e, redis.Nil) {
 		return false, nil
 	}
 	return false, e

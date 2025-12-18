@@ -327,6 +327,11 @@ func (m *Mysql) DropDatabase() (err error) {
 
 func (m *Mysql) createDB() (err error) {
 	log.Println("创建数据库")
+	defer func() {
+		if err == nil {
+			log.Printf("数据库创建完成,使用数据库: %s\n", m.DbName())
+		}
+	}()
 	createDBSql := fmt.Sprintf(`CREATE DATABASE IF NOT EXISTS %s;`, m.DbName())
 	return m.ExecSqOnNewEngine(createDBSql)
 }
@@ -338,9 +343,7 @@ func (m *Mysql) ExecSqOnNewEngine(sq string) (err error) {
 	if err != nil {
 		return
 	}
-	defer func() {
-		_ = dba.Close()
-	}()
+	defer func() { _ = dba.Close() }()
 	_, err = dba.Exec(sq)
 	return
 }
@@ -398,20 +401,20 @@ func (m *Mysql) sync() (err error) {
 				for _, c1 := range obj.CompoundIndexes() {
 					c1.SetSn(sn)
 					if e = c1.execCreate(tbName); e != nil {
-						return
+						return fmt.Errorf("[CompoundIndex] [%s] error: %w", tbName, e)
 					}
 				}
 			}
 
 			if obj, ok := table.(ItfInitData); ok {
 				if e = initializeTables(obj, sn); e != nil {
-					return
+					return fmt.Errorf("[InitData] [%s] error: %w", tbName, e)
 				}
 			}
 
 			if obj, ok := table.(ItfAfterSync); ok {
 				if e = obj.AfterSync(sn); e != nil {
-					return
+					return fmt.Errorf("[AfterSync] [%s] error: %w", tbName, e)
 				}
 			}
 		}
@@ -435,7 +438,9 @@ type (
 	}
 
 	//ItfInitData ...
-	ItfInitData interface{ InitData() []interface{} }
+	ItfInitData interface {
+		InitData() []interface{}
+	}
 )
 
 // SetSn ...
@@ -499,14 +504,15 @@ func (c *CompoundIndex) execCreate(table string) (err error) {
 
 	sq1 := `SHOW INDEX FROM {{.table}} WHERE Key_name = '{{.index_name}}'`
 	sq1 = g2util.TextTemplateMustParse(sq1, mp1)
-	sq2 := `ALTER TABLE {{.table}} ADD {{.unique}}INDEX {{.index_name}} ({{.indexes}})`
-	sq2 = g2util.TextTemplateMustParse(sq2, mp1)
-
-	indexCount, err := c.sn.SQL(sq1).Count()
-	if err != nil || indexCount > 0 {
+	rs1, err := c.sn.MustLogSQL(true).SQL(sq1).Query()
+	if err != nil {
+		return fmt.Errorf("查询复合索引失败: %w,\n%s", err, sq1)
+	}
+	if len(rs1) > 0 {
 		return
 	}
-
+	sq2 := `ALTER TABLE {{.table}} ADD {{.unique}}INDEX {{.index_name}} ({{.indexes}})`
+	sq2 = g2util.TextTemplateMustParse(sq2, mp1)
 	_, err = c.sn.Exec(sq2)
 	return
 }
