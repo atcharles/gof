@@ -1,0 +1,33 @@
+name: 'tenant_vip'
+global:
+  pprof_port: ':8081'
+  host: '127.0.0.1'
+  #日志级别: trace,debug,info,warn,error,fatal,panic
+  log_level: 'debug'
+http_server:
+  api_root: ''
+  port: ':8080'
+  #release|debug
+  mode: 'release'
+  #全局限速,每秒访问次数限制
+  limit: 5
+mysql:
+  #&parseTime=True
+  dsn: 'root:123@tcp({host}:3306)/{db}?charset=utf8mb4&collation=utf8mb4_bin&timeout=5s&loc=Local'
+  db: 'db1'
+  use_cache: false
+  show_sql: true
+  log_level: 'debug'
+  max_idle_connections: 10
+  max_open_connections: 200
+  max_conn_lifetime_seconds: 60
+redis:
+  host: '{host}:6379'
+  pwd: '123'
+  max_retries: 3
+  min_idle_connections: 2
+  max_conn_age_seconds: 600
+emqx:
+  broker: '{host}:23001'
+  super_username: 'admin'
+  super_password: 'public'
