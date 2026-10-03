@@ -24,6 +24,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/ledisdb/ledisdb v0.0.0-20200510135210-d35789ec47e6
 	github.com/lithammer/shortuuid/v3 v3.0.7
+	github.com/moby/locker v1.0.1
 	github.com/mojocn/base64Captcha v1.3.8
 	github.com/novalagung/gubrak/v2 v2.0.2
 	github.com/panjf2000/ants/v2 v2.11.3

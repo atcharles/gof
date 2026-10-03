@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/moby/locker"
 	"github.com/novalagung/gubrak/v2"
 	"github.com/unknwon/com"
 
@@ -15,6 +16,8 @@ import (
 	"github.com/atcharles/gof/v2/g2util"
 )
 
+// 缓存键包含期号等不断变化的值，锁只保留到最后一个等待者完成。
+var cacheAtomicLocks locker.Locker
 var cacheNULL = "null"
 
 // MapString ...
@@ -128,10 +131,9 @@ type cacheMem struct {
 
 // Atomic ...
 func (c *cacheMem) Atomic(key string, fn func()) {
-	mu := Locker.Load(fmt.Sprintf("%s:%s", "cacheMem:Atomic", key))
-	mu.Lock()
+	cacheAtomicLocks.Lock(key)
+	defer func() { _ = cacheAtomicLocks.Unlock(key) }()
 	fn()
-	mu.Unlock()
 }
 
 // Constructor New ...

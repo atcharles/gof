@@ -26,9 +26,11 @@ Temporary Items
 tests
 *_test*
 !g2cache/store/store_test.go
+!g2db/cache_atomic_test.go
 logs
 *.log
 go.sum
+!go.sum
 conf.yml
 conf_*.yml
 *_temp*

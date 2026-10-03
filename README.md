@@ -110,3 +110,12 @@ curl -X POST 'http://127.0.0.1:8080/jsonrpc' \
 -H 'Content-Type: application/json' \
 --data-raw '{"id":1,"method":"api.get","params":["key"]}'
 ```
+
+
+## 缓存锁的生命周期
+
+`g2db.cacheMem.Atomic` 使用 `github.com/moby/locker v1.0.1`：同一缓存键仍然串行执行，不同键允许并行，最后一个等待者完成后删除锁记录。通过 `defer` 保证业务函数发生 panic 时也会解锁。该操作不再把每个历史缓存键永久保存在 `g2db.Locker` 中；公开的业务锁接口保持原有语义。
+
+依赖来自 Docker/Moby 的锁实现，Apache-2.0 许可，仅依赖 Go 标准库，兼容项目现有 Go 版本。选择其稳定数字版本，避免自行实现锁的引用计数或引入哈希分片导致不同键相互阻塞。依赖版本和校验和分别记录在 go.mod、go.sum。官方说明：https://github.com/moby/locker/tree/v1.0.1 。
+
+回归测试覆盖十万个历史键的 GC 后保留内存、跨实例的同键互斥、不同键并行，以及 panic 后可继续操作。维护责任属于 GoF 的 g2db 模块；升级锁库时必须重新运行 `go test -race ./g2db -run TestCacheAtomic`。该修复解决确定的历史键保留问题，不能单独证明某次生产 OOM 的起因。
