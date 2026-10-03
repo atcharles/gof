@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	store.Register(new(Ristretto).New())
+	store.RegisterFactory("ristretto", func() store.ItfCache { return new(Ristretto).New() })
 }
 
 // Ristretto ...

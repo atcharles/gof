@@ -25,6 +25,7 @@ Temporary Items
 
 tests
 *_test*
+!g2cache/store/store_test.go
 logs
 *.log
 go.sum

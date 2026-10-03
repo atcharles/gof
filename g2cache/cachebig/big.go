@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	store.Register(new(BigCache).New())
+	store.RegisterFactory("big", func() store.ItfCache { return new(BigCache).New() })
 }
 
 // BigCache ...
